@@ -127,3 +127,30 @@ Planejamos construir ferramentas para isso e esperamos que outros façam o mesmo
 
 Comentários e sugestões para melhorias são bem-vindas.
 Planejamos modificar e extender este documento conforme nosso entendimento melhorar e a linguagem e o conjunto de bibliotecas disponíveis melhorem também.
+
+# <a name="S-introduction"></a>In: Introdução
+
+Este é um conjunto de diretrizes para C++ moderno, C++14, e absorvendo melhorias futuras e levando Especificações Técnicas ISO (TSs) (*ISO Technical Specifications*) em consideração.
+O objetivo é ajudar programadores C++ a escreverem códigos mais simples, eficientes e manuteníveis.
+
+Índice de introdução:
+
+* [In.target: Leitores alvo](#SS-readers)
+* [In.aims: Objetivos](#SS-aims)
+* [In.not: Não-objetivos](#SS-non)
+* [In.force: Execução](#SS-force)
+* [In.struct: Estrutura deste documento](#SS-struct)
+* [In.sec: Seções importantes](#SS-sec)
+
+## <a name="SS-readers"></a>In.target: Leitores alvo
+
+Todos os programadores C++. Isso inclui [programadores que talvez considerem C](#-cpl).
+
+## <a name="SS-aims"></a>In.aims: Objetivos
+
+A proposta deste documento é auxiliar desenvolvedores a adotar C++ moderno (C++11, C++14 e, em breve, C++17) e para atingirmos um estilo mais uniforme através das bases de código.
+
+Nós não temos a ilusão de que cada uma dessas regras possam ser efetivamente aplicadas a todas as bases de código. Atualizar sistemas antigos é difícil. Entretanto, acreditamos que um programa que utilize uma regra é menos propenso a erros e mais manutenível que um que não utilize. Frequentemente, as regras levam a um desenvolvimento inicial mais rápido/fácil.
+Até onde sabemos, essas regras levam a código que rodam tão bem ou melhor que técnicas antigas ou mais convencionais; são regras que seguem o princípio de zero gasto adicional (*zero-overhead*) (*"O que vc não utiliza, você não irá pagar por isso"* ou *"quando você utiliza um mecanismo de abstração de forma correta, você obtém performance pelo menos tão boa quanto se você tivesse escrito o código a mão utilizando construções de baixo-nível da linguagem"*).
+Considere estas diretrizes como ideais para novos códigos, oportunidades para explorar quando estiver trabalhando com código antigo e tente se aproximar desses ideais o máximo possível.
+Lembre:
