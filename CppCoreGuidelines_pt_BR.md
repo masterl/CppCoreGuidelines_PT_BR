@@ -186,12 +186,12 @@ Entretanto, quando existem duas maneiras de expressar uma ideia e uma é sabidam
 
 ## <a name="SS-non"></a>In.not: Não-objetivos
 
-The rules are not intended to be minimal or orthogonal.
-In particular, general rules can be simple, but unenforceable.
-Also, it is often hard to understand the implications of a general rule.
-More specialized rules are often easier to understand and to enforce, but without general rules, they would just be a long list of special cases.
-We provide rules aimed at helping novices as well as rules supporting expert use.
-Some rules can be completely enforced, but others are based on heuristics.
+As regras não foram feitas para serem mínimas ou ortogonais.
+Particularmente, regras gerais podem ser simples, mas não executáveis.
+Normalmente é difícil de entender as implicações de uma regra geral.
+Regras mais especializadas são mais fáceis de entender e executar, mas sem regras gerais, elas seriam somente uma longa lista de casos especiais.
+Nós provemos regras que visam ajudar novatos, bem como regras que auxiliam uso avançado da linguagem.
+Algumas regras podem ser completamente executadas, enquanto outras são baseadas em heurísticas.
 
 These rules are not meant to be read serially, like a book.
 You can browse through them using the links.
