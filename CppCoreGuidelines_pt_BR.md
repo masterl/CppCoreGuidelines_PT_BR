@@ -183,3 +183,154 @@ As regras são projetadas para permitir [Adoção gradual](#S-modernizing).
 Algumas regras visam aumentar várias formas de segurança enquanto outras visam reduzir a probabilidade de acidentes, muitas fazem ambos.
 As diretrizes destinadas a prevenir acidentes frequentemente banem C++ perfeitamente legal.
 Entretanto, quando existem duas maneiras de expressar uma ideia e uma é sabidamente uma fonte de erros e a outra não, tentaremos guiar os programadores para utilizarem a segunda.
+
+## <a name="SS-non"></a>In.not: Não-objetivos
+
+The rules are not intended to be minimal or orthogonal.
+In particular, general rules can be simple, but unenforceable.
+Also, it is often hard to understand the implications of a general rule.
+More specialized rules are often easier to understand and to enforce, but without general rules, they would just be a long list of special cases.
+We provide rules aimed at helping novices as well as rules supporting expert use.
+Some rules can be completely enforced, but others are based on heuristics.
+
+These rules are not meant to be read serially, like a book.
+You can browse through them using the links.
+However, their main intended use is to be targets for tools.
+That is, a tool looks for violations and the tool returns links to violated rules.
+The rules then provide reasons, examples of potential consequences of the violation, and suggested remedies.
+
+These guidelines are not intended to be a substitute for a tutorial treatment of C++.
+If you need a tutorial for some given level of experience, see [the references](#S-references).
+
+This is not a guide on how to convert old C++ code to more modern code.
+It is meant to articulate ideas for new code in a concrete fashion.
+However, see [the modernization section](#S-modernizing) for some possible approaches to modernizing/rejuvenating/upgrading.
+Importantly, the rules support gradual adoption: It is typically infeasible to convert all of a large code base at once.
+
+These guidelines are not meant to be complete or exact in every language-technical detail.
+For the final word on language definition issues, including every exception to general rules and every feature, see the ISO C++ standard.
+
+The rules are not intended to force you to write in an impoverished subset of C++.
+They are *emphatically* not meant to define a, say, Java-like subset of C++.
+They are not meant to define a single "one true C++" language.
+We value expressiveness and uncompromised performance.
+
+The rules are not value-neutral.
+They are meant to make code simpler and more correct/safer than most existing C++ code, without loss of performance.
+They are meant to inhibit perfectly valid C++ code that correlates with errors, spurious complexity, and poor performance.
+
+The rules are not perfect.
+A rule can do harm by prohibiting something that is useful in a given situation.
+A rule can do harm by failing to prohibit something that enables a serious error in a given situation.
+A rule can do a lot of harm by being vague, ambiguous, unenforceable, or by enabling every solution to a problem.
+It is impossible to completely meet the "do no harm" criteria.
+Instead, our aim is the less ambitious: "Do the most good for most programmers";
+if you cannot live with a rule, object to it, ignore it, but don't water it down until it becomes meaningless.
+Also, suggest an improvement.
+
+## <a name="SS-force"></a>In.force: Execução
+
+Rules with no enforcement are unmanageable for large code bases.
+Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
+
+* But we want lots of rules, and we want rules that everybody can use.
+* But different people have different needs.
+* But people don't like to read lots of rules.
+* But people can't remember many rules.
+
+So, we need subsetting to meet a variety of needs.
+
+* But arbitrary subsetting leads to chaos.
+
+We want guidelines that help a lot of people, make code more uniform, and strongly encourage people to modernize their code.
+We want to encourage best practices, rather than leave all to individual choices and management pressures.
+The ideal is to use all rules; that gives the greatest benefits.
+
+This adds up to quite a few dilemmas.
+We try to resolve those using tools.
+Each rule has an **Enforcement** section listing ideas for enforcement.
+Enforcement might be by code review, by static analysis, by compiler, or by run-time checks.
+Wherever possible, we prefer "mechanical" checking (humans are slow, inaccurate, and bore easily) and static checking.
+Run-time checks are suggested only rarely where no alternative exists; we do not want to introduce "distributed fat".
+Where appropriate, we label a rule (in the **Enforcement** sections) with the name of groups of related rules (called "profiles").
+A rule can be part of several profiles, or none.
+For a start, we have a few profiles corresponding to common needs (desires, ideals):
+
+* **type**: No type violations (reinterpreting a `T` as a `U` through casts, unions, or varargs)
+* **bounds**: No bounds violations (accessing beyond the range of an array)
+* **lifetime**: No leaks (failing to `delete` or multiple `delete`) and no access to invalid objects (dereferencing `nullptr`, using a dangling reference).
+
+The profiles are intended to be used by tools, but also serve as an aid to the human reader.
+We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
+
+Tools that implement these rules shall respect the following syntax to explicitly suppress a rule:
+
+    [[suppress(tag)]]
+
+where "tag" is the anchor name of the item where the Enforcement rule appears (e.g., for [C.134](#Rh-public) it is "Rh-public"), the
+name of a profile group-of-rules ("type", "bounds", or "lifetime"),
+or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#Pro-bounds-arrayindex)).
+
+## <a name="SS-struct"></a>In.struct: Estrutura deste documento
+
+Each rule (guideline, suggestion) can have several parts:
+
+* The rule itself -- e.g., **no naked `new`**
+* A rule reference number -- e.g., **C.7** (the 7th rule related to classes).
+  Since the major sections are not inherently ordered, we use a letter as the first part of a rule reference "number".
+  We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
+* **Reason**s (rationales) -- because programmers find it hard to follow rules they don't understand
+* **Example**s -- because rules are hard to understand in the abstract; can be positive or negative
+* **Alternative**s -- for "don't do this" rules
+* **Exception**s -- we prefer simple general rules. However, many rules apply widely, but not universally, so exceptions must be listed
+* **Enforcement** -- ideas about how the rule might be checked "mechanically"
+* **See also**s -- references to related rules and/or further discussion (in this document or elsewhere)
+* **Note**s (comments) -- something that needs saying that doesn't fit the other classifications
+* **Discussion** -- references to more extensive rationale and/or examples placed outside the main lists of rules
+
+Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
+We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
+Also, we assume that the rules will be refined over time to make them more precise and checkable.
+
+A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
+Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
+If you don't understand a rule or disagree with it, please visit its **Discussion**.
+If you feel that a discussion is missing or incomplete, enter an [Issue](https://github.com/isocpp/CppCoreGuidelines/issues)
+explaining your concerns and possibly a corresponding PR.
+
+This is not a language manual.
+It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
+Recommended information sources can be found in [the references](#S-references).
+
+## <a name="SS-sec"></a>In.sec: Principais seções
+
+* [In: Introdução](#S-introduction)
+* [P: Filosofia](#S-philosophy)
+* [I: Interfaces](#S-interfaces)
+* [F: Funções](#S-functions)
+* [C: Classes e hierarquias de classes](#S-class)
+* [Enum: Enumerações](#S-enum)
+* [R: Gerência de recursos](#S-resource)
+* [ES: Expressões e declarações](#S-expr)
+* [E: Resolução de erros](#S-errors)
+* [Con: Constantes e imutabilidade](#S-const)
+* [T: Templates e programação genérica](#S-templates)
+* [CP: Concorrência](#S-concurrency)
+* [SL: The Standard library](#S-stdlib)
+* [SF: Arquivos fonte](#S-source)
+* [CPL: Programação estilo C](#S-cpl)
+* [Pro: Perfis](#S-profile)
+* [GSL: Guideline support library](#S-gsl)
+* [FAQ: Respostas a perguntas frequentes](#S-faq)
+
+Seções de suporte:
+
+* [NL: Nomenclatura e layout](#S-naming)
+* [Per: Performance](#S-performance)
+* [N: Não-Regras e mitos](#S-not)
+* [RF: Referências](#S-references)
+* [Apêndice A: Bibliotecas](#S-libraries)
+* [Apêndice B: Modernizando código](#S-modernizing)
+* [Apêndice C: Discussão](#S-discussion)
+* [Glossário](#S-glossary)
+* [Pendências: Proto-regras não-classificadas](#S-unclassified)
