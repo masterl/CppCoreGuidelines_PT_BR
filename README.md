@@ -9,11 +9,13 @@ Tradução: *Dentro do C++ existe uma linguagem menor, mais simples e mais segur
 
 As [Diretrizes Centrais para C++](CppCoreGuidelines_pt_BR.md) são um esforço colaborativo encabeçado por Bjarne Stroustrup, assim como a linguagem C++. São o resultado de muitos anos de discussão e projetos através de diversas organizações. O projeto dessas diretrizes encoraja aplicabilidade de forma genérica e ampla adoção, mas podem ser copiadas e alteradas para se adequarem às necessidades de sua organização.
 
-## Getting started
+## Começando
 
-The guidelines themselves are found at [CppCoreGuidelines](CppCoreGuidelines.md). There is also [a version formatted for browsing] (http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) that is manually integrated and thus slightly older than the version in the master branch.
+As diretrizes podem ser acessadas em [Diretrizes Centrais para C++](CppCoreGuidelines_pt_BR.md).
 
-Many of the guidelines make use of the header-only Guideline Support Library. One implementation is available at [GSL: Guideline Support Library](https://github.com/Microsoft/GSL).
+- Existe também uma versão para browser (**em inglês**) (http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) que é manualmente atualizada então ***normalmente está um pouco atrasada em relação ao GitHub***
+
+Boa parte das diretrizes fazem uso da biblioteca *header-only* **Guideline Support Library**. Uma implementação dessa biblioteca está disponível em [GSL: Guideline Support Library](https://github.com/Microsoft/GSL).
 
 ## Background and scope
 
