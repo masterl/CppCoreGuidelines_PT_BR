@@ -38,7 +38,12 @@ Não esperamos que você memorize todas as regras antes de começar a escrever c
 
 As diretrizes se destinam a serem introduzidas de forma gradual à uma base de código. Planejamos construir ferramentas para isso e esperamos que outros façam o mesmo.
 
-## Contributions and LICENSE
+## Contribuições e LICENÇA
 
-Comments and suggestions for improvements are most welcome. We plan to modify and extend this document as our understanding improves and the
-language and the set of available libraries improve. More details are found at [CONTRIBUTING](./CONTRIBUTING.md) and [LICENSE](./LICENSE) .
+Comentários e sugestões para melhorias são bem-vindas. Planejamos modificar e extender este documento conforme nosso entendimento melhorar e a linguagem e o conjunto de bibliotecas disponíveis melhorem também.
+
+*Ainda farei um documento para contribuir com esta tradução*
+
+Licença: [LICENSE](./LICENSE).
+
+Para contribuir diretamente no repositório original, ver (***em inglês***) [CONTRIBUTING](https://github.com/isocpp/CppCoreGuidelines/blob/master/CONTRIBUTING.md).
