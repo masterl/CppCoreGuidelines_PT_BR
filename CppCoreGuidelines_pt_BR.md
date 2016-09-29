@@ -154,3 +154,32 @@ Nós não temos a ilusão de que cada uma dessas regras possam ser efetivamente 
 Até onde sabemos, essas regras levam a código que rodam tão bem ou melhor que técnicas antigas ou mais convencionais; são regras que seguem o princípio de zero gasto adicional (*zero-overhead*) (*"O que vc não utiliza, você não irá pagar por isso"* ou *"quando você utiliza um mecanismo de abstração de forma correta, você obtém performance pelo menos tão boa quanto se você tivesse escrito o código a mão utilizando construções de baixo-nível da linguagem"*).
 Considere estas diretrizes como ideais para novos códigos, oportunidades para explorar quando estiver trabalhando com código antigo e tente se aproximar desses ideais o máximo possível.
 Lembre:
+
+### <a name="R0"></a>In.0: Não entre em pânico!
+
+Tome seu tempo para entender as implicações de uma regra de diretriz no seu programa.
+
+Essas diretrizes são projetadas de acordo com o princípio "subconjunto do superconjunto" ([Stroustrup05](#Stroustrup05)).
+Elas não simplesmente definem um subconjunto do C++ para ser usado (para confiabilidade, segurança, performance, etc).
+Ao invés disso, elas recomendam fortemente o use de algumas "extensões" simples (([Guidelines Support Library](#S-gsl))) que tornam redundante o uso das funcionalidades mais propensas a erro do C++, de forma que estas possam ser banidas (no nosso conjunto de regras).
+
+As regras enfatizam segurança estática de tipos e segurança de recursos.
+Por essa razão, elas enfatizam possibilidades para checagem de limites, para evitar derreferência de `nullptr`, para evitar ponteiros soltos e o uso sistemático de exceções (por meio de RAII).
+Parte para atingir estes objetivos e parte para minimizar código obscuro como fonte de erros, as regras também enfatizam simplicidade e a abstrair partes complexas em interfaces bem especificadas.
+
+Muitas das diretrizes são prescritivas.
+Ficamos incomodados com regras que simplesmente dizem "não faça isso!" sem oferecer uma alternativa.
+Uma consequência disso é que algumas diretrizes só tem embasamento em heurísticas, ao invés de checagens precisas e mecânicamente verificáveis.
+Outras diretrizes articulam princípios gerais. Para essas diretrizes mais gerais, regras mais específicas e detalhadas proveem checagem parcial.
+
+Estas diretrizes falam do núcleo do C++ e seu uso.
+Esperamos que a maioria das organizações, áreas de aplicação específicas e projetos ainda maiores vão precisar de mais regras, possivelmente mais restrições e maior suporte de bibliotecas.
+Por exemplo, programadores em tempo real normalmente não podem usar o `free store` (memória dinâmica) livremente e estarão mais restritos na escolha de bibliotecas.
+Encorajamos o desenvolvimento de regras mais específicas como adendo a essas diretrizes centrais.
+Construa sua pequena biblioteca base e use-a, ao invés de rebaixar seu nível de programação ao glorioso código assembly.
+
+As regras são projetadas para permitir [Adoção gradual](#S-modernizing).
+
+Algumas regras visam aumentar várias formas de segurança enquanto outras visam reduzir a probabilidade de acidentes, muitas fazem ambos.
+As diretrizes destinadas a prevenir acidentes frequentemente banem C++ perfeitamente legal.
+Entretanto, quando existem duas maneiras de expressar uma ideia e uma é sabidamente uma fonte de erros e a outra não, tentaremos guiar os programadores para utilizarem a segunda.
