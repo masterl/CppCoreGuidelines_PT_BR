@@ -1,5 +1,7 @@
 # Diretrizes Centrais para C++
 
+***Tradução em português do Brasil***
+
 Repositório original (**em inglês**): [C++ Core Guidelines](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
 >"Within C++ is a smaller, simpler, safer language struggling to get out."
@@ -17,32 +19,24 @@ As diretrizes podem ser acessadas em [Diretrizes Centrais para C++](CppCoreGuide
 
 Boa parte das diretrizes fazem uso da biblioteca *header-only* **Guideline Support Library**. Uma implementação dessa biblioteca está disponível em [GSL: Guideline Support Library](https://github.com/Microsoft/GSL).
 
-## Background and scope
+## Experiência e escopo
 
-The aim of the guidelines is to help people to use modern C++ effectively. By "modern C++" we mean C++11 and C++14 (and soon C++17). In other
-words, what would you like your code to look like in 5 years' time, given that you can start now? In 10 years' time?
+O objetivo das diretrizes é auxiliar as pessoas a utilizarem C++ moderno de forma efetiva. Por "C++ moderno" nos referimos a C++11 e C++14 (e em breve C++17). Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
 
-The guidelines are focused on relatively higher-level issues, such as interfaces, resource management, memory management, and concurrency. Such
-rules affect application architecture and library design. Following the rules will lead to code that is statically type-safe, has no resource
-leaks, and catches many more programming logic errors than is common in code today. And it will run fast -- you can afford to do things right.
+As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência. Tais regras afetam arquitetura da aplicação e projeto de bibliotecas. Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de memória, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
 
-We are less concerned with low-level issues, such as naming conventions and indentation style. However, no topic that can help a programmer is
-out of bounds.
+Estamos menos preocupados com problemas de baixo-nível, tais como convenções de nome e estilo de indentação, entretanto nenhum tópico que possa auxiliar um programador está fora dos limites.
 
-Our initial set of rules emphasizes safety (of various forms) and simplicity. They may very well be too strict. We expect to have to introduce
-more exceptions to better accommodate real-world needs. We also need more rules.
+Nosso conjunto inicial de regras enfatizam segurança (de diversas formas) e simplicidade. Elas podem até ser muito estritas. Esperamos ter que introduzir exceções para melhor acomodar necessidades do mundo real. Também precisamos de mais regras.
 
-You will find some of the rules contrary to your expectations or even contrary to your experience. If we haven't suggested that you change your
-coding style in any way, we have failed! Please try to verify or disprove rules! In particular, we'd really like to have some of our rules
-backed up with measurements or better examples.
+Você irá considerar algumas das regras contrárias às suas expectativas ou mesmo contrárias à sua experiência. Se não tivéssemos sugerido que você mudasse seu estilo de codificação de alguma forma, então falhamos! Por favor teste para verificar ou negar as regras! Adoraríamos ter algumas de nossas regras melhor embasadas por medidas ou melhores exemplos.
 
-You will find some of the rules obvious or even trivial. Please remember that one purpose of a guideline is to help someone who is less
-experienced or coming from a different background or language to get up to speed.
+Você irá achar algumas das regras muito óbvias ou mesmo triviais. Tente lembrar que um dos propósitos de uma diretriz é ajudar alguém que tenha pouca experiência ou que venha de um ambiente ou linguagem diferente a se nivelarem.
 
-The rules are designed to be supported by an analysis tool. Violations of rules will be flagged with references (or links) to the relevant rule.
-We do not expect you to memorize all the rules before trying to write code.
+As diretrizes são projetadas para terem suporte de uma ferramenta de análise. Violações das regras serão indicadas com referências (ou links) para a regra em questão.
+Não esperamos que você memorize todas as regras antes de começar a escrever código.
 
-The rules are meant for gradual introduction into a code base. We plan to build tools for that and hope others will too.
+As diretrizes se destinam a serem introduzidas de forma gradual à uma base de código. Planejamos construir ferramentas para isso e esperamos que outros façam o mesmo.
 
 ## Contributions and LICENSE
 
