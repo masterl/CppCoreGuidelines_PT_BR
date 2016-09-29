@@ -1,6 +1,7 @@
 # <a name="main"></a>Diretrizes Centrais para C++
 
 #### Tradução de um snapshot de 28/09/2016
+***!!! tradução em progresso !!!***
 
 Editores:
 
@@ -78,3 +79,51 @@ ou olhe uma funcionalidade específica da linguagem
 * [`template`](#S-???)
 * [`unsigned`](#S-???)
 * [`virtual`](#SS-hier)
+
+Definição de termos usados para expressar e discutir as regras, que não são técnicos da linguagem, mas se referem a técnicas de projeto e programação
+
+* erro
+* exceção
+* falha
+* invariante
+* vazamento
+* pre-condição
+* pós-condição
+* recurso
+* garantia de exceção
+
+# <a name="S-abstract"></a>Abstract
+
+Este documento é um conjunto de diretrizes para utilizar C++ bem.
+O objetivo deste documento é ajudar as pessoas a utilizarem C++ moderno efetivamente.
+Por "C++ moderno" queremos dizer C++11 e C++14 (e em breve C++17).
+Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
+
+As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência.
+Tais regras afetam arquitetura da aplicação e projeto de bibliotecas.
+Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de memória, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
+
+Estamos menos preocupados com problemas de baixo-nível, tais como convenções de nome e estilo de indentação, entretanto nenhum tópico que possa auxiliar um programador está fora dos limites.
+
+Nosso conjunto inicial de regras enfatizam segurança (de diversas formas) e simplicidade. Elas podem até ser muito estritas.
+Esperamos ter que introduzir exceções para melhor acomodar necessidades do mundo real.
+Também precisamos de mais regras.
+
+Você irá considerar algumas das regras contrárias às suas expectativas ou mesmo contrárias à sua experiência.
+Se não tivéssemos sugerido que você mudasse seu estilo de codificação de alguma forma, então falhamos!
+Por favor teste para verificar ou negar as regras!
+Adoraríamos ter algumas de nossas regras melhor embasadas por medidas ou melhores exemplos.
+
+Você irá achar algumas das regras muito óbvias ou mesmo triviais.
+Tente lembrar que um dos propósitos de uma diretriz é ajudar alguém que tenha pouca experiência ou que venha de um ambiente ou linguagem diferente a se nivelarem.
+
+As diretrizes são projetadas para terem suporte de uma ferramenta de análise.
+Violações das regras serão indicadas com referências (ou links) para a regra em questão.
+Não esperamos que você memorize todas as regras antes de começar a escrever código.
+Uma maneira de descrever estas diretrizes é como uma especificação para ferramentas que coincidentemente é legível por humanos.
+
+As diretrizes se destinam a serem introduzidas de forma gradual à uma base de código.
+Planejamos construir ferramentas para isso e esperamos que outros façam o mesmo.
+
+Comentários e sugestões para melhorias são bem-vindas.
+Planejamos modificar e extender este documento conforme nosso entendimento melhorar e a linguagem e o conjunto de bibliotecas disponíveis melhorem também.
