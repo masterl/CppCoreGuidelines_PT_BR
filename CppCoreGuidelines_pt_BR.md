@@ -592,10 +592,12 @@ A menos que a intenção de um determinado trecho de código esteja explícita (
 ##### Exemplo
 
 ```cpp
+
 gsl::index i = 0;
 while (i < v.size()) {
     // ... faz algo com v[i] ...
 }
+
 ```
 
 A intenção de "apenas" iterar pelos elementos de `v` não está explícita aqui. O detalhe de implementação de um índice está exposto (então pode ser utilizado incorretamente) e `i` continua existindo fora do escopo do laço, o que pode ou não ser intencional. O leitor não consegue saber somente com esse trecho de código.
@@ -603,21 +605,27 @@ A intenção de "apenas" iterar pelos elementos de `v` não está explícita aqu
 Melhor:
 
 ```cpp
+
 for (const auto& x : v) { /* faz algo com o valor de x */ }
+
 ```
 
 Agora não existe menção explícita ao mecanismo de iteração e o laço opera com referências contantes a cada elemento de forma que uma alteração acidental não possa ocorrer. Caso se deseje modificar, basta fazer:
 
 ```cpp
+
 for (auto& x : v) { /* modifica x */ }
+
 ```
 
 Para mais detalhes sobre laços for, veja [ES.71](#Res-for-range).
 Melhor ainda, utilize um algoritmo nomeado:
 
 ```cpp
+
 for_each(v, [](int x) { /* faz algo com o valor de x */ });
 for_each(par, v, [](int x) { /* faz algo com o valor de x */ });
+
 ```
 
 A última opção deixa claro que não estamos interessados na ordem em que os elementos de `v` são utilizados.
@@ -641,8 +649,10 @@ Algumas construções da linguagem expressam intenção melhor que outras.
 Se dois `int`s têm por objetivo serem coordenadas de um ponto 2D, por exemplo:
 
 ```cpp
+
 draw_line(int, int, int, int);  // obscuro
 draw_line(Point, Point);        // mais claro
+
 ```
 
 ##### Imposição
@@ -656,3 +666,33 @@ Procure por padrões comuns para os quais existem alternativas melhores
 * funções com muitos parâmetros de tipos básicos
 
 Existem muitas oportunidades para esperteza e transformação de programa semi-automática.
+
+### <a name="Rp-typesafe"></a>P.4: Idealmente, um programa deve ser staticamente *type safe*
+
+##### Razão
+
+Idealmente, um programa deve ser completamente e estaticamente (em tempo de compilação) *type safe*.
+Infelizmente, isso não é possível. Áreas problemáticas:
+
+* `union`s
+* casts (conversões de tipo)
+* decaimento de array
+* erros de coleção (por exemplo, acessar posição fora de um array)
+* conversões truncantes
+
+##### Nota
+
+Essas áreas são fonte se problemas sérios. Por exemplo, encerramento inesperado do programa e violações de segurança.
+Nós tentamos prover técnicas alternativas.
+
+##### Imposição
+
+Podemos banir, restringir or detectar cada categoria problemática separadamente, tal qual seja requerido ou factível em determinados programas.
+Sempre sugira uma alternativa.
+Por exemplo:
+
+* `union`s -- use `variant` (introduzido no C++17)
+* casts -- minimize seu uso; templates podem ajudar
+* decaimento de array -- utilize `span` (da GSL)
+* erros de coleção -- utilize `span`
+* conversões truncantes -- minimize seu uso ou utilize `narrow` ou `narrow_cast` (da GSL) onde forem necessárias
