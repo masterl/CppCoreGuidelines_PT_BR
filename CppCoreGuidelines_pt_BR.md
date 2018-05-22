@@ -554,3 +554,105 @@ Bem difícil no geral.
 * utilizar `const` de forma consistente (cheque se os métodos alteram seu objeto; cheque se as funções modificam argumentos passados por ponteiro ou referência)
 * sinalizar o uso de casts (casts neutralizam o sistema de tipos)
 * detectar código que imite a biblioteca padrão (difícil)
+
+### <a name="Rp-Cplusplus"></a>P.2: Programe em C++ padrão (ISO)
+
+##### Razão
+
+Esse é um conjunto de diretrizes para escrever C++ padrão ISO.
+
+##### Nota
+
+Existem ambientes onde extensões são necessárias, por exemplo, acessar recursos do sistema.
+Em tais casos, localize o uso das extensões necessárias e controle seu uso com diretrizes de programação "não-core" (ou seja, diferente das apresentadas aqui). Se possível, construa interfaces que encapsulem as extensões de forma que estas possam ser desligadas ou removidas da compilação em sistemas que não suportem essas extensões.
+
+Extensões costumam não ter semânticas rigorosamente definidas. Até extensões que são comuns e implementadas por diversos compiladores podem ter comportamentos levemente diferentes e casos de contorno como um resultado direto de *não* ter um padrão rigorosamente definido. Quanto maior for o uso de tais extensões, mais a portabilidade do código sofrerá impactos.
+
+##### Nota
+
+Utilizar C++ padrão ISO válido não garante portabilidade (quanto menos corretude).
+Evite depender de comportamento indefinido (exemplo: [ordem de avaliação indefinida](#Res-order)) e esteja alerta quanto à construções cujo significado dependa de implementação (exemplo: `sizeof(int)`).
+
+##### Nota
+
+Existem ambientes em que as restrições ao uso da linguagem C++ ou de recursos de biblioteca são necessários, por exemplo:
+evitar alocação dinâmica, algo que é requerido por padrões de software de controle aéreo.
+Em tais casos, controle seu (des)uso com uma extensão *destas diretrizes de codificação* adaptadas a este ambiente específico.
+
+##### Imposição
+
+Utilize um compilador C++ atualizado (atualmente C++17, C++14 ou C++11) com um conjunto de opções que não aceite extensões.
+
+### <a name="Rp-what"></a>P.3: Expresse intenção
+
+##### Razão
+
+A menos que a intenção de um determinado trecho de código esteja explícita (por exemplo utilizando nomes legíveis ou comentários), é impossível dizer se o código está fazendo o que deveria fazer.
+
+##### Exemplo
+
+```cpp
+gsl::index i = 0;
+while (i < v.size()) {
+    // ... faz algo com v[i] ...
+}
+```
+
+A intenção de "apenas" iterar pelos elementos de `v` não está explícita aqui. O detalhe de implementação de um índice está exposto (então pode ser utilizado incorretamente) e `i` continua existindo fora do escopo do laço, o que pode ou não ser intencional. O leitor não consegue saber somente com esse trecho de código.
+
+Melhor:
+
+```cpp
+for (const auto& x : v) { /* faz algo com o valor de x */ }
+```
+
+Agora não existe menção explícita ao mecanismo de iteração e o laço opera com referências contantes a cada elemento de forma que uma alteração acidental não possa ocorrer. Caso se deseje modificar, basta fazer:
+
+```cpp
+for (auto& x : v) { /* modifica x */ }
+```
+
+Para mais detalhes sobre laços for, veja [ES.71](#Res-for-range).
+Melhor ainda, utilize um algoritmo nomeado:
+
+```cpp
+for_each(v, [](int x) { /* faz algo com o valor de x */ });
+for_each(par, v, [](int x) { /* faz algo com o valor de x */ });
+```
+
+A última opção deixa claro que não estamos interessados na ordem em que os elementos de `v` são utilizados.
+
+Um programador deve se familiarizar com
+
+* [A biblioteca de suporte às diretrizes](#S-gsl)
+* [A biblioteca padrão ISO C++](#S-stdlib)
+* Quaisquer bibliotecas utilizadas no projeto atual
+
+##### Nota
+
+Descrição alternativa: Diga *o que* deve ser feito e não apenas *como* deve ser feito.
+
+##### Nota
+
+Algumas construções da linguagem expressam intenção melhor que outras.
+
+##### Exemplo
+
+Se dois `int`s têm por objetivo serem coordenadas de um ponto 2D, por exemplo:
+
+```cpp
+draw_line(int, int, int, int);  // obscuro
+draw_line(Point, Point);        // mais claro
+```
+
+##### Imposição
+
+Procure por padrões comuns para os quais existem alternativas melhores
+
+* laços `for` simples ***ou*** `range-for`
+* interfaces `f(T*, int)` ***ou*** `f(span<T>)`
+* variáveis de controle de laço em escopos muito grandes
+* `new` e `delete` nus
+* funções com muitos parâmetros de tipos básicos
+
+Existem muitas oportunidades para esperteza e transformação de programa semi-automática.
