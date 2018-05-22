@@ -696,3 +696,173 @@ Por exemplo:
 * decaimento de array -- utilize `span` (da GSL)
 * erros de coleção -- utilize `span`
 * conversões truncantes -- minimize seu uso ou utilize `narrow` ou `narrow_cast` (da GSL) onde forem necessárias
+
+### <a name="Rp-compile-time"></a>P.5: Prefira checagem em tempo de compilação em detrimento das em tempo de execução
+
+##### Razão
+
+Clareza no código e performance.
+Você não precisa tratar erros que possam ser pegos em tempo de compilação.
+
+##### Exemplo
+
+```cpp
+// int is an alias used for integers
+int bits = 0;               // não faça: código evitável
+for (Int i = 1; i; i <<= 1)
+    ++bits;
+if (bits < 32)
+    cerr << "Int too small\n";
+```
+
+Esse exemplo falha no que ele está tentando fazer (devido a overflow ser indefinido) e deveria ser trocado por um simples `static_assert`:
+
+```cpp
+// int is an alias used for integers
+static_assert(sizeof(Int) >= 4);    // faça: checagem em tempo de compilação
+```
+
+Ou melhor ainda: simplesmente utilize o sistema de tipos e troque `int` por `int32_t`, por exemplo.
+
+##### Exemplo
+
+```cpp
+void read(int* p, int n);   // ler no máximo n inteiros e armazenar em p
+
+int a[100];
+read(a, 1000);    // ruim, extrapola o tamanho do array
+```
+
+melhor:
+
+```cpp
+void read(span<int> r); // ler para a coleção de inteiros r
+
+int a[100];
+read(a);        // melhor: deixe o compilador definir a quantidade de elementos
+```
+
+**Justificativa**: Não deixe para tempo de execução o que pode ser feito em tempo de compilação
+
+##### Imposição
+
+* Procure por argumentos do tipo ponteiro
+* Procure por checagens em tempo de execução de violações de coleção
+
+### <a name="Rp-run-time"></a>P.6: O que não pode ser checado em tempo de compilação deve ser checável em tempo de execução
+
+##### Razão
+
+Deixar erros difíceis de detectar em um programa é pedir por interrupção prematura e resultados ruins.
+
+##### Nota
+
+Idealmente, nós capturamos todos os erros (que não sejam erros de lógica) ou em tempo de compilação ou em tempo de execução. É impossível capturar todos os erros em tempo de compilação e normalmente não é barato capturar os erros remanescentes em tempo de execução. Entretanto, devemos nos esforçar em escrever programas que a princípio possam ser checados, dados recursos suficientes (ferramentas de análise, checagens em tempo de execução, recursos da máquina, tempo, ...).
+
+##### Exemplo, ruim
+
+```cpp
+// compilado separadamente, possivelmente carregado dinamicamente
+extern void f(int* p);
+
+void g(int n)
+{
+    // ruim: quantidade de elementos não é passada para f()
+    f(new int[n]);
+}
+```
+
+Aqui uma parte crucial da informação (o número de elementos) foi tão "ocultada" que análise estática provavelmente se tornou impossível de ser feita e checagem dinâmica pode ser muito difícil quando `f()` é parte de uma `ABI` (*Application Binary Interface*) que não nos permite "instrumentar" esse ponteiro. Nós poderíamos anexar informação útil à `free store`, mas isso iria requerer mudanças globais em um sistema e talvez no compilador. O que temos aqui é um design que torna detecção de erro muito difícil.
+
+##### Exemplo, ruim
+
+Claro, poderíamos passar o número de elementos junto do ponteiro:
+
+```cpp
+// compilado separadamente, possivelmente carregado dinamicamente
+extern void f2(int* p, int n);
+
+void g2(int n)
+{
+    f2(new int[n], m);  // ruim: uma quantidade errada de elementos pode ser passada a f()
+}
+```
+
+Passar o número de elementos como argumento é melhor (e bem mais comum) que passar somente o ponteiro e depender de alguma convenção implícita em relação à quantidade de elementos ou como calcular tal informação. Entretanto, como demonstrado, um simples erro de digitação pode introduzir um erro sério. A conexão entre os dois argumentos de `f2()` é convencional e não explícita.
+
+Outra coisa, será que também está implícito que `f2()` deve fazer o `delete` desse ponteiro ou será que quem chamou a função cometeu um segundo erro?
+
+##### Exemplo, ruim
+
+Os ponteiros para gerência de recurso da biblioteca padrão falham em passar o tamanho quando eles apontam para um objeto:
+
+```cpp
+// compilado separadamente, possivelmente carregado dinamicamente
+// NB: assume-se que o código executor seja ABI-compatible, utilizando
+// um compilador C++ compatível e a mesma implementação da stdlib
+extern void f3(unique_ptr<int[]>, int n);
+
+void g3(int n)
+{
+    f3(make_unique<int[]>(n), m);    // ruim: passa posse e tamanho separadamente
+}
+```
+
+##### Exemplo
+
+Precisamos passar o ponteiro e a quantidade de elementos como um objeto só:
+
+```cpp
+extern void f4(vector<int>&);   // compilado separadamente, possivelmente carregado dinamicamente
+extern void f4(span<int>);      // compilado separadamente, possivelmente carregado dinamicamente
+                                // NB: NB: assume-se que o código executor seja ABI-compatible, utilizando
+                                // um compilador C++ compatível e a mesma implementação da stdlib
+
+void g3(int n)
+{
+    vector<int> v(n);
+    f4(v);                     // passa uma reference, mantém posse
+    f4(span<int>{v});          // passa uma visualização, mantém posse
+}
+```
+
+Esse design carrega a quantidade de elementos junto como parte de um objeto, assim erros são improváveis e checagem dinâmica (em tempo de execução) são sempre possíveis de serem feitas, ainda que nem sempre se possa pagar pelos custos.
+
+##### Exemplo
+
+Como podemos transferir tanto posse quanto todas as informações para validar o uso?
+
+```cpp
+vector<int> f5(int n)    // OK: movimento
+{
+    vector<int> v(n);
+    // ... inicializa v ...
+    return v;
+}
+
+unique_ptr<int[]> f6(int n)    // ruim: perde o 'n'
+{
+    auto p = make_unique<int[]>(n);
+    // ... inicializa *p ...
+    return p;
+}
+
+owner<int*> f7(int n)    // ruim: perde o 'n' e podemos esquecer de executar o `delete`
+{
+    owner<int*> p = new int[n];
+    // ... inicializa *p ...
+    return p;
+}
+```
+
+
+##### Exemplo
+
+* ???
+* mostrar como checagens possíveis são evitadas por interfaces que trocam classes base polimórficas, quando elas sabem do que precisam?
+  Ou strings como opções "free-style"
+
+##### Imposição
+
+* Sinalize interfaces do tipo (ponteiro, contador) (isso irá sinalizar vários exemplos que não podem ser corrigidos por questões de compatibilidade)
+* ???
