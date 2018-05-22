@@ -14,14 +14,15 @@ As [Diretrizes Centrais para C++](CppCoreGuidelines_pt_BR.md) são um esforço c
 ## Começando
 
 As diretrizes podem ser acessadas em [Diretrizes Centrais para C++](CppCoreGuidelines_pt_BR.md).
+O documento é escrito em [GitHub-flavored MarkDown](https://github.github.com/gfm/).
 
-- Existe também uma versão para browser (**em inglês**) (http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) que é manualmente atualizada então ***normalmente está um pouco atrasada em relação ao GitHub***
+- Existe também uma versão para browser (**em inglês**) (http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) que é manualmente atualizada então ***normalmente está um pouco atrasada em relação ao texto em MarkDown***
 
 Boa parte das diretrizes fazem uso da biblioteca *header-only* **Guideline Support Library**. Uma implementação dessa biblioteca está disponível em [GSL: Guideline Support Library](https://github.com/Microsoft/GSL).
 
 ## Experiência e escopo
 
-O objetivo das diretrizes é auxiliar as pessoas a utilizarem C++ moderno de forma efetiva. Por "C++ moderno" nos referimos a C++11 e C++14 (e em breve C++17). Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
+O objetivo das diretrizes é auxiliar as pessoas a utilizarem C++ moderno de forma efetiva. Por "C++ moderno" nos referimos a C++11, C++14 e C++17. Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
 
 As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência. Tais regras afetam arquitetura da aplicação e projeto de bibliotecas. Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de memória, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
 
@@ -42,7 +43,7 @@ As diretrizes se destinam a serem introduzidas de forma gradual à uma base de c
 
 Comentários e sugestões para melhorias são bem-vindas. Planejamos modificar e extender este documento conforme nosso entendimento melhorar e a linguagem e o conjunto de bibliotecas disponíveis melhorem também.
 
-*Ainda farei um documento para contribuir com esta tradução*
+***Falta criar um documento para guiar contribuições com esta tradução***
 
 Licença: [LICENSE](./LICENSE).
 
