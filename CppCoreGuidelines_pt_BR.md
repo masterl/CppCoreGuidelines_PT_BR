@@ -438,3 +438,119 @@ Essas seções não são ortogonais.
 
 Cada seção (por exemplo, "P" -> "Filosofia") e cada subseção (exemplo: "C.hier" para hierarquias de classes) tem uma abreviação para facilitar buscas e referência.
 Abreviações das seções principais também são utilizadas nos números das regras (exemplo: "C.11" para "Torne regular tipos concretos").
+
+# <a name="S-philosophy"></a>P: Filosofia
+
+As regras nessa seção são bem genéricas.
+
+Lista de regras filosóficas:
+
+* [P.1: Expresse idéias diretamente no código](#Rp-direct)
+* [P.2: Programe em C++ padrão (ISO)](#Rp-Cplusplus)
+* [P.3: Expresse intenção](#Rp-what)
+* [P.4: Idealmente, um programa deve ser staticamente *type safe*](#Rp-typesafe)
+* [P.5: Prefira checagem em tempo de compilação em detrimento das em tempo de execução](#Rp-compile-time)
+* [P.6: O que não pode ser checado em tempo de compilação deve ser checável em tempo de execução](#Rp-run-time)
+* [P.7: Capture erros em tempo de execução cedo](#Rp-early)
+* [P.8: Não vaze recursos](#Rp-leak)
+* [P.9: Não desperdiçe tempo ou espaço](#Rp-waste)
+* [P.10: Prefira dados imutáveis](#Rp-mutable)
+* [P.11: Encapsule conceitos complicados, ao invés de espalhar pelo código](#Rp-library)
+* [P.12: Use ferramentas de suporte quando apropriado](#Rp-tools)
+* [P.13: Use bibliotecas de suporte quando apropriado](#Rp-lib)
+
+Regras filosóficas em geral não são mecanicamente verificáveis.
+Entretanto, regras individuais refletindo esses temas filosóficos são.
+Sem uma base filosófica, faltaria embasamento às regras mais concretas/específicas/checáveis.
+
+### <a name="Rp-direct"></a>P.1: Expresse idéias diretamente no código
+
+##### Razão
+
+Compiladores não lêem comentários (ou documentos de design) e nem muitos programadores (no geral).
+O que é expresso em código tem semântica definida e pode (a princípio) ser checado por compiladores e outras ferramentas.
+
+##### Exemplo
+
+```cpp
+class Date {
+    // ...
+public:
+    Month month() const;  // faça
+    int month();          // não faça
+    // ...
+};
+```
+
+A primeira declaração do método `month` é explicita quanto a retornar um Mês (`Month`) e sobre não modificar o estado de um objeto `Date`.
+A segunda versão deixa o leitor tentar adivinhar como o método funciona e abre mais possibilidades em relação a bugs não-notados.
+
+##### Exemplo; ruim
+
+Esse loop é uma forma restrita de `std::find`:
+
+```cpp
+void f(vector<string>& v)
+{
+    string val;
+    cin >> val;
+    // ...
+    int index = -1;                    // ruim, e poderia utilizar gsl::index
+    for (int i = 0; i < v.size(); ++i) {
+        if (v[i] == val) {
+            index = i;
+            break;
+        }
+    }
+    // ...
+}
+```
+
+##### Example; bom
+
+Uma forma muito mais clara de expressar intenção seria:
+
+```cpp
+void f(vector<string>& v)
+{
+    string val;
+    cin >> val;
+    // ...
+    auto p = find(begin(v), end(v), val);  // melhor
+    // ...
+}
+```
+
+Uma biblioteca bem projetada expressa intenção (o que deve ser feito, ao invés de apenas como algo está sendo feito) muito melhor que o uso direto de recursos da linguagem.
+
+Um programador C++ deve saber o básico da biblioteca padrão e usá-la quando apropriado.
+Qualquer programador deve saber o básico das bibliotecas do projeto no qual trabalha e usá-las apropriadamente.
+Qualquer programador utilizando essas diretrizes devem conhecer a [biblioteca de suporte das diretrizes (GSL)](#S-gsl) e usá-la apropriadamente.
+
+##### Exemplo
+
+```cpp
+change_speed(double s);   // ruim: o que s significa?
+// ...
+change_speed(2.3);
+```
+
+Uma abordagem melhor é ser explícito quanto ao significado do parâmetro `double` (é o novo valor da velocidade ou uma diferença em relação ao valor antigo?) e a unidade utilizada:
+
+```cpp
+change_speed(Speed s);    // melhor: o significado de s é explícito
+// ...
+change_speed(2.3);        // erro: sem unidade
+change_speed(23m / 10s);  // metros por segundo
+```
+
+Até poderíamos aceitar um simples `double` sem unidade como um delta, mas seria propenso a erros.
+Se quiséssemos ambos velocidade absoluta e deltas, poderíamos ter definido um tipo `Delta`.
+
+##### Imposição
+
+Bem difícil no geral.
+
+* utilizar `const` de forma consistente (cheque se os métodos alteram seu objeto; cheque se as funções modificam argumentos passados por ponteiro ou referência)
+* sinalizar o uso de casts (casts neutralizam o sistema de tipos)
+* detectar código que imite a biblioteca padrão (difícil)
