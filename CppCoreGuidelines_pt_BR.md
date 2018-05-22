@@ -1,6 +1,7 @@
 # <a name="main"></a>Diretrizes Centrais para C++
 
-#### Tradução de um snapshot de 28/09/2016
+#### Tradução de um snapshot de 21/04/2018
+
 ***!!! tradução em progresso !!!***
 
 Editores:
@@ -8,13 +9,13 @@ Editores:
 * [Bjarne Stroustrup](http://www.stroustrup.com)
 * [Herb Sutter](http://herbsutter.com/)
 
-Este documento é um rascunho inicial. Está incorreto, incompleto e porcamente formatado.
-Se fosse um projeto open source (código), esta seria a versão 0.7.
-Cópia, utilização, modificação e criação de trabalhos derivados deste projeto está licenciada pela licença MIT.
+Este é um documento vivo que sofre melhorias constantemente.
+Se fosse um projeto open source (código), esta seria a versão 0.8.
+Cópia, utilização, modificação e criação de trabalhos derivados deste projeto está licenciada sob uma licença MIT.
 Contribuir para este projeto requer concordar com a Licença de Contribuidor. Ver [LICENSE](LICENSE) para maiores detalhes.
 Deixamos este projeto disponível para "usuários amigáveis" usarem, copiarem, modificarem e derivarem dele, na esperança de uma contribuição positiva.
 
-Comentários e sugestões de melhoria são bem-vindas.
+Comentários e sugestões de melhoria são bem-vindos.
 Planejamos modificar e extender este documento conforme nosso entendimento melhorar e a linguagem e o conjunto de bibliotecas disponíveis melhorem também.
 Antes de comentar, ver [a introdução](#S-introduction) que define nossos objetivos e abordagem geral.
 A lista de contribuidores está [aqui](#SS-ack).
@@ -37,7 +38,7 @@ Você pode [ler uma explicação do escopo e estrutura destas diretrizes](#S-abs
 * [R: Gerência de recursos](#S-resource)
 * [ES: Expressões e declarações](#S-expr)
 * [Per: Performance](#S-performance)
-* [CP: Concorrência](#S-concurrency)
+* [CP: Concorrência e paralelismo](#S-concurrency)
 * [E: Resolução de erros](#S-errors)
 * [Con: Constantes e imutabilidade](#S-const)
 * [T: Templates e programação genérica](#S-templates)
@@ -52,58 +53,150 @@ Seções de suporte:
 * [RF: Referências](#S-references)
 * [Pro: Perfis](#S-profile)
 * [GSL: Guideline support library](#S-gsl)
-* [NL: Nomenclatura e layout](#S-naming)
+* [NL: Nomenclatura e regras de layout](#S-naming)
 * [FAQ: Respostas para perguntas frequentes](#S-faq)
 * [Apêndice A: Bibliotecas](#S-libraries)
 * [Apêndice B: Modernizando código](#S-modernizing)
 * [Apêndice C: Discussão](#S-discussion)
+* [Apêndice D: Ferramentas de suporte](#S-tools)
 * [Glossário](#S-glossary)
 * [Pendências: Proto-regras não-classificadas](#S-unclassified)
 
 ou olhe uma funcionalidade específica da linguagem
 
-* [atribuição](#S-???)
-* [`class`](#S-class)
-* [construtor](#SS-ctor)
-* [`class` derivada](#SS-hier)
-* [destrutor](#SS-dtor)
-* [exceção](#S-errors)
-* [`for`](#S-???)
-* [`inline`](#S-class)
-* [inicialização](#S-???)
-* [expressão lambda](#SS-lambdas)
-* [`operator`](#S-???)
-* [`public`, `private`, e `protected`](#S-???)
-* [`static_assert`](#S-???)
-* [`struct`](#S-class)
-* [`template`](#S-???)
-* [`unsigned`](#S-???)
-* [`virtual`](#SS-hier)
+* atribuição:
+[tipos regulares](#Rc-regular) --
+[prefira inicialização](#Rc-initialize) --
+[cópia](#Rc-copy-semantics) --
+[movimento](#Rc-move-semantics) --
+[outras operações](#Rc-matched) --
+[padrão](#Rc-eqdefault)
+* `class`:
+[dados](#Rc-org) --
+[invariante](#Rc-struct) --
+[membros](#Rc-member) --
+[helpers](#Rc-helper) --
+[tipos concretos](#SS-concrete) --
+[construtores, = e destrutores](#S-ctor) --
+[hierarquia](#SS-hier) --
+[operadores](#SS-overload)
+* `concept`:
+[regras](#SS-concepts) --
+[em programação genérica](#Rt-raise) --
+[argumentos de templates](#Rt-concepts) --
+[semântica](#Rt-low)
+* construtor:
+[invariante](#Rc-struct) --
+[estabelecer invariante](#Rc-ctor) --
+[`throw`](#Rc-throw) --
+[default](#Rc-default0) --
+[não necessário](#Rc-default) --
+[`explicit`](#Rc-explicit) --
+[delegante](#Rc-delegating) --
+[`virtual`](#Rc-ctor-virtual)
+* classe derivada:
+[quando usar](#Rh-domain) --
+[como interface](#Rh-abstract) --
+[destrutores](#Rh-dtor) --
+[cópia](#Rh-copy) --
+[getters e setters](#Rh-get) --
+[herança múltipla](#Rh-mi-interface) --
+[sobrecarga](#Rh-using) --
+[fatiando](#Rc-copy-virtual) --
+[`dynamic_cast`](#Rh-dynamic_cast)
+* destrutores:
+[e construtores](#Rc-matched) --
+[quando são necessários?](#Rc-dtor) --
+[não devem falhar](#Rc-dtor-fail)
+* exceção:
+[erros](#S-errors) --
+[`throw`](#Re-throw) --
+[somente para erros](#Re-errors) --
+[`noexcept`](#Re-noexcept) --
+[minimize o uso de `try`](#Re-catch) --
+[e se eu não puder usar exceções?](#Re-no-throw-codes)
+* `for`:
+[range-for e for](#Res-for-range) --
+[for e while](#Res-for-while) --
+[for-initializer](#Res-for-init) --
+[corpo vazio](#Res-empty) --
+[variável de laço](#Res-loop-counter) --
+[tipo da variável de laço ???](#Res-???)
+* função:
+[nomenclatura](#Rf-package) --
+[operação singular](#Rf-logical) --
+[no throw](#Rf-noexcept) --
+[argumentos](#Rf-smart) --
+[passagem de argumentos](#Rf-conventional) --
+[múltiplos valores de retorno](#Rf-out-multi) --
+[ponteiros](#Rf-return-ptr) --
+[lambdas](#Rf-capture-vs-overload)
+* `inline`:
+[funções pequenas](#Rf-inline) --
+[em cabeçalhos](#Rs-inline)
+* inicialização:
+[sempre](#Res-always) --
+[prefira `{}`](#Res-list) --
+[lambdas](#Res-lambda-init) --
+[inicializadores 'in-class'](#Rc-in-class-initializer) --
+[membros de classe](#Rc-initialize) --
+[funções fábrica](#Rc-factory)
+* expressão lambda:
+[quando usar](#SS-lambdas)
+* operador:
+[convencional](#Ro-conventional) --
+[evite operadores de conversão](#Ro-conversion) --
+[e lambdas](#Ro-lambda)
+* `public`, `private`, e `protected`:
+[escondendo informação](#Rc-private) --
+[consistência](#Rh-public) --
+[`protected`](#Rh-protected)
+* `static_assert`:
+[checagem em tempo de compilação](#Rp-compile-time) --
+[e concepts](#Rt-check-class)
+* `struct`:
+[para organizar dados](#Rc-org) --
+[use se não houver invariantes](#Rc-struct) --
+[nenhum membro privado](#Rc-class)
+* `template`:
+[abstração](#Rt-raise) --
+[contêiners](#Rt-cont) --
+[concepts](#Rt-concepts)
+* `unsigned`:
+[e `signed`](#Res-mix) --
+[manipulação de bits](#Res-unsigned)
+* `virtual`:
+[interfaces](#Ri-abstract) --
+[não `virtual`](#Rc-concrete) --
+[destrutor](#Rc-dtor-virtual) --
+[nunca falhe](#Rc-dtor-fail)
 
 Definição de termos usados para expressar e discutir as regras, que não são técnicos da linguagem, mas se referem a técnicas de projeto e programação
 
-* erro
-* exceção
-* falha
-* invariante
-* vazamento
-* pre-condição
-* pós-condição
-* recurso
-* garantia de exceção
+* asserção: ???
+* erro: ???
+* exceção: ???
+* garantia de exceção: ???
+* falha: ???
+* invariante: ???
+* vazamento: ???
+* biblioteca: ???
+* pré-condição: ???
+* pós-condição: ???
+* recurso: ???
 
 # <a name="S-abstract"></a>Abstract
 
 Este documento é um conjunto de diretrizes para utilizar C++ bem.
 O objetivo deste documento é ajudar as pessoas a utilizarem C++ moderno efetivamente.
-Por "C++ moderno" queremos dizer C++11 e C++14 (e em breve C++17).
+Por "C++ moderno" queremos dizer C++17, C++14 e C++11.
 Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
 
 As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência.
 Tais regras afetam arquitetura da aplicação e projeto de bibliotecas.
-Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de memória, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
+Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de recursos, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
 
-Estamos menos preocupados com problemas de baixo-nível, tais como convenções de nome e estilo de indentação, entretanto nenhum tópico que possa auxiliar um programador está fora dos limites.
+Estamos menos preocupados com problemas de baixo-nível, tais como convenções de nomenclatura e estilo de indentação, entretanto, nenhum tópico que possa auxiliar um programador está fora dos limites.
 
 Nosso conjunto inicial de regras enfatizam segurança (de diversas formas) e simplicidade. Elas podem até ser muito estritas.
 Esperamos ter que introduzir exceções para melhor acomodar necessidades do mundo real.
@@ -130,7 +223,7 @@ Planejamos modificar e extender este documento conforme nosso entendimento melho
 
 # <a name="S-introduction"></a>In: Introdução
 
-Este é um conjunto de diretrizes para C++ moderno, C++14, e absorvendo melhorias futuras e levando Especificações Técnicas ISO (TSs) (*ISO Technical Specifications*) em consideração.
+Este é um conjunto de diretrizes para C++ moderno, C++17, C++14 e C++11, absorvendo melhorias futuras e levando em consideração Especificações Técnicas ISO (TSs) (*ISO Technical Specifications*).
 O objetivo é ajudar programadores C++ a escreverem códigos mais simples, eficientes e manuteníveis.
 
 Índice de introdução:
@@ -148,7 +241,7 @@ Todos os programadores C++. Isso inclui [programadores que talvez considerem C](
 
 ## <a name="SS-aims"></a>In.aims: Objetivos
 
-A proposta deste documento é auxiliar desenvolvedores a adotar C++ moderno (C++11, C++14 e, em breve, C++17) e para atingirmos um estilo mais uniforme através das bases de código.
+A proposta deste documento é auxiliar desenvolvedores a adotar C++ moderno (C++17, C++14 e C++11) e para atingirmos um estilo mais uniforme através das bases de código.
 
 Nós não temos a ilusão de que cada uma dessas regras possam ser efetivamente aplicadas a todas as bases de código. Atualizar sistemas antigos é difícil. Entretanto, acreditamos que um programa que utilize uma regra é menos propenso a erros e mais manutenível que um que não utilize. Frequentemente, as regras levam a um desenvolvimento inicial mais rápido/fácil.
 Até onde sabemos, essas regras levam a código que rodam tão bem ou melhor que técnicas antigas ou mais convencionais; são regras que seguem o princípio de zero gasto adicional (*zero-overhead*) (*"O que vc não utiliza, você não irá pagar por isso"* ou *"quando você utiliza um mecanismo de abstração de forma correta, você obtém performance pelo menos tão boa quanto se você tivesse escrito o código a mão utilizando construções de baixo-nível da linguagem"*).
@@ -157,15 +250,15 @@ Lembre:
 
 ### <a name="R0"></a>In.0: Não entre em pânico!
 
-Tome seu tempo para entender as implicações de uma regra de diretriz no seu programa.
+Tome seu tempo para entender as implicações de uma regra das diretrizes no seu programa.
 
 Essas diretrizes são projetadas de acordo com o princípio "subconjunto do superconjunto" ([Stroustrup05](#Stroustrup05)).
 Elas não simplesmente definem um subconjunto do C++ para ser usado (para confiabilidade, segurança, performance, etc).
-Ao invés disso, elas recomendam fortemente o use de algumas "extensões" simples (([Guidelines Support Library](#S-gsl))) que tornam redundante o uso das funcionalidades mais propensas a erro do C++, de forma que estas possam ser banidas (no nosso conjunto de regras).
+Ao invés disso, elas recomendam fortemente o uso de algumas "extensões" simples ([Guidelines Support Library](#S-gsl)) que tornam redundante o uso das funcionalidades mais propensas a erro do C++, de forma que estas possam ser banidas (no nosso conjunto de regras).
 
 As regras enfatizam segurança estática de tipos e segurança de recursos.
-Por essa razão, elas enfatizam possibilidades para checagem de limites, para evitar derreferência de `nullptr`, para evitar ponteiros soltos e o uso sistemático de exceções (por meio de RAII).
-Parte para atingir estes objetivos e parte para minimizar código obscuro como fonte de erros, as regras também enfatizam simplicidade e a abstrair partes complexas em interfaces bem especificadas.
+Por essa razão, elas enfatizam possibilidades para checagem de limites, para evitar derreferência de `nullptr`, para evitar ponteiros soltos e o uso sistemático de exceções (por meio de *RAII*).
+Em parte para atingir estes objetivos e parte para minimizar código obscuro como fonte de erros, as regras também enfatizam simplicidade e a abstrair as partes complexas em interfaces bem especificadas.
 
 Muitas das diretrizes são prescritivas.
 Ficamos incomodados com regras que simplesmente dizem "não faça isso!" sem oferecer uma alternativa.
@@ -174,133 +267,137 @@ Outras diretrizes articulam princípios gerais. Para essas diretrizes mais gerai
 
 Estas diretrizes falam do núcleo do C++ e seu uso.
 Esperamos que a maioria das organizações, áreas de aplicação específicas e projetos ainda maiores vão precisar de mais regras, possivelmente mais restrições e maior suporte de bibliotecas.
-Por exemplo, programadores em tempo real normalmente não podem usar o `free store` (memória dinâmica) livremente e estarão mais restritos na escolha de bibliotecas.
+Por exemplo, programadores de aplicações em tempo real normalmente não podem usar o `free store` (memória dinâmica) livremente e estarão mais restritos na escolha de bibliotecas.
 Encorajamos o desenvolvimento de regras mais específicas como adendo a essas diretrizes centrais.
 Construa sua pequena biblioteca base e use-a, ao invés de rebaixar seu nível de programação ao glorioso código assembly.
 
-As regras são projetadas para permitir [Adoção gradual](#S-modernizing).
+As regras são projetadas para permitir [adoção gradual](#S-modernizing).
 
 Algumas regras visam aumentar várias formas de segurança enquanto outras visam reduzir a probabilidade de acidentes, muitas fazem ambos.
-As diretrizes destinadas a prevenir acidentes frequentemente banem C++ perfeitamente legal.
+As diretrizes destinadas a prevenir acidentes frequentemente banem trechos C++ perfeitamente legais.
 Entretanto, quando existem duas maneiras de expressar uma ideia e uma é sabidamente uma fonte de erros e a outra não, tentaremos guiar os programadores para utilizarem a segunda.
 
 ## <a name="SS-non"></a>In.not: Não-objetivos
 
 As regras não foram feitas para serem mínimas ou ortogonais.
-Particularmente, regras gerais podem ser simples, mas não executáveis.
+Particularmente, regras gerais podem ser simples, mas talvez não seja possível impor tais regras.
 Normalmente é difícil de entender as implicações de uma regra geral.
-Regras mais especializadas são mais fáceis de entender e executar, mas sem regras gerais, elas seriam somente uma longa lista de casos especiais.
+Regras mais especializadas são mais fáceis de entender e impor, mas sem regras gerais, elas seriam somente uma longa lista de casos especiais.
 Nós provemos regras que visam ajudar novatos, bem como regras que auxiliam uso avançado da linguagem.
-Algumas regras podem ser completamente executadas, enquanto outras são baseadas em heurísticas.
+Algumas regras podem ser completamente impostas, enquanto outras são baseadas em heurísticas.
 
-These rules are not meant to be read serially, like a book.
-You can browse through them using the links.
-However, their main intended use is to be targets for tools.
-That is, a tool looks for violations and the tool returns links to violated rules.
-The rules then provide reasons, examples of potential consequences of the violation, and suggested remedies.
+Estas regras não foram feitas para serem lidas sequencialmente, como um livro.
+Você pode verificá-las usando os links.
+Entretanto, seu maior uso é para serem alvos para ferramentas.
+Ou seja, uma ferramenta procura violações das regras e retorna links para as regras que foram violadas.
+As regras provêem razões, exemplos de prováveis consequências da violação e sugestões de correção.
 
-These guidelines are not intended to be a substitute for a tutorial treatment of C++.
-If you need a tutorial for some given level of experience, see [the references](#S-references).
+Essas diretrizes não tem por objetivo substituir tutoriais à linguagem C++.
+Se você precisa de algum tipo de tutorial para algum nível de experiência na linguagem, veja [as referências](#S-references).
 
-This is not a guide on how to convert old C++ code to more modern code.
-It is meant to articulate ideas for new code in a concrete fashion.
-However, see [the modernization section](#S-modernizing) for some possible approaches to modernizing/rejuvenating/upgrading.
-Importantly, the rules support gradual adoption: It is typically infeasible to convert all of a large code base at once.
+Este não é um guia de como converter código C++ "velho" em código mais moderno.
+O objetivo é articular idéias para serem utilizadas em códigos novos de forma concreta.
+Entretanto, veja [a seção de modernização](#S-modernizing) para algumas abordagens para modernizar/rejuvenescer/atualizar código antigo.
+Importante: as regras suportam adoção gradual, afinal normalmente é impraticável querer converter uma grande base de código inteira de uma só vez.
 
-These guidelines are not meant to be complete or exact in every language-technical detail.
-For the final word on language definition issues, including every exception to general rules and every feature, see the ISO C++ standard.
+Essas diretrizes não têm a intenção de serem completas ou exatas em todos os detalhes técnicos da linguagem.
+Para uma palavra final em problemas relativos à definição da linguagem, incluindo todas as exceções às regras gerais e cada funcionalidade, olhe o padrão ISO C++.
 
-The rules are not intended to force you to write in an impoverished subset of C++.
-They are *emphatically* not meant to define a, say, Java-like subset of C++.
-They are not meant to define a single "one true C++" language.
-We value expressiveness and uncompromised performance.
+As regras não têm a intenção de forçar você a programar utilizando um subconjunto empobrecido do C++.
+Elas *enfaticamente* não se destinam a definir um tipo de subset "a la Java" de C++.
+Elas não se destinam a definir uma única "verdadeira linguagem C++".
+Nós valorizamos expressividade e performance sem compromisso.
 
-The rules are not value-neutral.
-They are meant to make code simpler and more correct/safer than most existing C++ code, without loss of performance.
-They are meant to inhibit perfectly valid C++ code that correlates with errors, spurious complexity, and poor performance.
+As regras não são neutras.
+Elas foram feitas para tornar código mais simples e mais correto/seguro do que a maior parte dos códigos C++ existentes, sem perda de performance.
+Elas foram feitas para inibir códigos C++ perfeitamente válidos que correlacionam com erros, complexidade falsa e baixa performance.
 
-The rules are not perfect.
-A rule can do harm by prohibiting something that is useful in a given situation.
-A rule can do harm by failing to prohibit something that enables a serious error in a given situation.
-A rule can do a lot of harm by being vague, ambiguous, unenforceable, or by enabling every solution to a problem.
-It is impossible to completely meet the "do no harm" criteria.
-Instead, our aim is the less ambitious: "Do the most good for most programmers";
-if you cannot live with a rule, object to it, ignore it, but don't water it down until it becomes meaningless.
-Also, suggest an improvement.
+As regras não são perfeitas.
+Uma regra pode causar mal ao proibir algo que é útil em uma determinada situação.
+Uma regra pode causar mal ao falhar em proibir algo que permita um erro sério em uma determinada situação.
+Uma regra pode causar muito mal ao ser vaga, ambígua, não ser possível de impor ou por permitir toda solução para um problema.
+É impossível garantir completamente o critério de "não fazer mal".
+Ao invés disso, nosso objetivo é menos ambicioso: "Fazer o maior bem para a maioria dos programadores".
+Se você não puder viver sob uma determinada regra, se oponha a ela, ignore-a, mas não a altere de forma que ela se torne sem sentido.
+Não esqueça de sugerir melhorias.
 
-## <a name="SS-force"></a>In.force: Execução
+## <a name="SS-force"></a>In.force: Imposição das regras
 
-Rules with no enforcement are unmanageable for large code bases.
-Enforcement of all rules is possible only for a small weak set of rules or for a specific user community.
+Ter regras sem imposição não é algo gerenciável em grandes bases de código.
+Imposição das regras só é possível para um pequeno e fraco conjunto de regras ou para uma comunidade de usuários específica.
 
-* But we want lots of rules, and we want rules that everybody can use.
-* But different people have different needs.
-* But people don't like to read lots of rules.
-* But people can't remember many rules.
+* Mas queremos várias regras e queremos regras que todos possam usar.
+* Mas pessoas diferentes tem necessidades diferentes.
+* Mas pessoas não gostam de ler um monte de regras.
+* Mas pessoas não vão lembrar de tantas regras.
 
-So, we need subsetting to meet a variety of needs.
+Então, precisamos de um subconjunto que atenda a várias necessidades.
 
-* But arbitrary subsetting leads to chaos.
+* Mas criar um subconjunto arbitrário leva ao caos.
 
-We want guidelines that help a lot of people, make code more uniform, and strongly encourage people to modernize their code.
-We want to encourage best practices, rather than leave all to individual choices and management pressures.
-The ideal is to use all rules; that gives the greatest benefits.
+Nós queremos diretrizes que ajudem várias pessoas, torne o código mais uniforme e que encorajam as pessoas a modernizar seu código.
+Nós queremos encorajar melhores práticas, ao invés de deixar tudo nas mãos de escolhas individuais e pressões gerenciais.
+O ideal é utilizar todas as regras que tragam os melhores benefícios.
 
-This adds up to quite a few dilemmas.
-We try to resolve those using tools.
-Each rule has an **Enforcement** section listing ideas for enforcement.
-Enforcement might be by code review, by static analysis, by compiler, or by run-time checks.
-Wherever possible, we prefer "mechanical" checking (humans are slow, inaccurate, and bore easily) and static checking.
-Run-time checks are suggested only rarely where no alternative exists; we do not want to introduce "distributed fat".
-Where appropriate, we label a rule (in the **Enforcement** sections) with the name of groups of related rules (called "profiles").
-A rule can be part of several profiles, or none.
-For a start, we have a few profiles corresponding to common needs (desires, ideals):
+Isso traz um monte de dilemas.
+Nós tentamos resolvê-los utilizando ferramentas.
+Cada regra tem um campo **Imposição** listando idéias de como impor tal regra.
+Imposição pode ser feita por revisão de código, por análise estática, pelo compilador ou por checagens em tempo de execução.
+Sempre que possível, nós preferimos checagem "mecânica" (humanos são lentos, inexatos e se entediam facilmente) e análise estática.
+Checagens em tempo de execução são sugeridas raramente onde nenhuma outra alternativa existe; nós não queremos introduzir "gordura distribuída".
+Sempre que apropriado, nós categorizamos uma regra (nas seções de **Imposição**) com o nome de grupos de regras associadas (chamadas "perfis").
+Uma regra pode ser parte de vários perfis ou nenhum.
+Para começar, temos alguns perfis correspondente a necessidades comuns (desejos, ideais):
 
-* **type**: No type violations (reinterpreting a `T` as a `U` through casts, unions, or varargs)
-* **bounds**: No bounds violations (accessing beyond the range of an array)
-* **lifetime**: No leaks (failing to `delete` or multiple `delete`) and no access to invalid objects (dereferencing `nullptr`, using a dangling reference).
+* **type**: Nenhuma violação de tipo (re-interpretar um `T` como `U` através de casts, unions ou `varargs`)
+* **bounds**: Nenhuma violação de limites (acessar posições que não pertençam a um array)
+* **lifetime**: Nenhum vazamento (esquecer de executar `delete` ou múltiplos `delete`) e nenhum acesso à objetos inválidos (de-referenciar `nullptr`, utilizando uma referência "solta")
 
-The profiles are intended to be used by tools, but also serve as an aid to the human reader.
-We do not limit our comment in the **Enforcement** sections to things we know how to enforce; some comments are mere wishes that might inspire some tool builder.
+Os perfis se destinam a serem usados por ferramentas, mas também auxiliar o leitor humano.
+Nós não limitamos nosso comentário nas seções de **Imposição** às coisas que sabemos como impor; alguns comentários são simples desejos que talvez inspirem algum construtor de ferramenta.
 
-Tools that implement these rules shall respect the following syntax to explicitly suppress a rule:
+Ferramentas que implementem essas regras devem respeitar a seguinte sintaxe para suprimir explicitamente uma regra:
 
-    [[suppress(tag)]]
+    [[gsl::suppress(tag)]]
 
-where "tag" is the anchor name of the item where the Enforcement rule appears (e.g., for [C.134](#Rh-public) it is "Rh-public"), the
-name of a profile group-of-rules ("type", "bounds", or "lifetime"),
-or a specific rule in a profile ([type.4](#Pro-type-cstylecast), or [bounds.2](#Pro-bounds-arrayindex)).
+onde "tag" é nome da âncora do item onde a regra de Imposição aparece.
+
+Exemplos:
+
+- para [C.134](#Rh-public) é "Rh-public")
+- o nome de um perfil de grupo de regras ("type", "bounds" ou "lifetime")
+- uma regra específica em um perfil ([type.4](#Pro-type-cstylecast))
+- [bounds.2](#Pro-bounds-arrayindex)
 
 ## <a name="SS-struct"></a>In.struct: Estrutura deste documento
 
-Each rule (guideline, suggestion) can have several parts:
+Cada regra (diretriz, sugestão) pode ter várias partes:
 
-* The rule itself -- e.g., **no naked `new`**
-* A rule reference number -- e.g., **C.7** (the 7th rule related to classes).
-  Since the major sections are not inherently ordered, we use a letter as the first part of a rule reference "number".
-  We leave gaps in the numbering to minimize "disruption" when we add or remove rules.
-* **Reason**s (rationales) -- because programmers find it hard to follow rules they don't understand
-* **Example**s -- because rules are hard to understand in the abstract; can be positive or negative
-* **Alternative**s -- for "don't do this" rules
-* **Exception**s -- we prefer simple general rules. However, many rules apply widely, but not universally, so exceptions must be listed
-* **Enforcement** -- ideas about how the rule might be checked "mechanically"
-* **See also**s -- references to related rules and/or further discussion (in this document or elsewhere)
-* **Note**s (comments) -- something that needs saying that doesn't fit the other classifications
-* **Discussion** -- references to more extensive rationale and/or examples placed outside the main lists of rules
+* A regra propriamente dita -- exemplo: **nenhum `new` nu**.
+* Um número de referência da regra -- exemplo: **C.7** (a sétima regra relativa à classes).
+Dado que as seções principais não são inerentemente ordenadas, nós utilizamos letras como prefixo do "número" de referência de uma regra.
+Nós deixamos lacunas nas numerações para minimizar "disrupções" quando adicionarmos ou removermos regras.
+* **Razõe**s (lógica) -- porque programadores acham difícil seguir regras que eles não entendem
+* **Exemplo**s -- porque regras são difíceis de entender de forma abstrata; pode ser positivo ou negativo
+* **Alternativa**s -- para regras do tipo "não faça isso"
+* **Exceções** -- nós preferimos regras simples e genéricas, entretanto, muitas regras são largamente aplicáveis, mas não universalmente, então exceções devem ser listadas
+* **Imposição** -- idéias de como a regra pode ser verificada de forma "mecânica"
+* **Veja também** -- fazem referência a regras correlacionadas e/ou discussões aprofundadas (neste documento ou em outro lugar)
+* **Nota**s (comentários) -- algo que precisa ser dito, mas que não se encaixa em nenhuma outra classificação
+* **Discussão** -- referências para explicações mais aprofundadas e/ou exemplos localizados fora das listas principais de regras
 
-Some rules are hard to check mechanically, but they all meet the minimal criteria that an expert programmer can spot many violations without too much trouble.
-We hope that "mechanical" tools will improve with time to approximate what such an expert programmer notices.
-Also, we assume that the rules will be refined over time to make them more precise and checkable.
+Algumas regras são difíceis de checar de forma mecânica, mas todas elas atendem o requisito mínimo de que um programador experiente pode notar várias violações sem grandes problemas.
+Nós esperamos que ferramentas "mecânicas" sejam melhoradas com o tempo para notarem o que tal programador experiente notaria.
+Também assumimos que as regras serão refinadas com o tempo para se tornarem mais precisas e checáveis.
 
-A rule is aimed at being simple, rather than carefully phrased to mention every alternative and special case.
-Such information is found in the **Alternative** paragraphs and the [Discussion](#S-discussion) sections.
-If you don't understand a rule or disagree with it, please visit its **Discussion**.
-If you feel that a discussion is missing or incomplete, enter an [Issue](https://github.com/isocpp/CppCoreGuidelines/issues)
-explaining your concerns and possibly a corresponding PR.
+Uma regra tem por objetivo ser simples, ao invés de cuidadosamente escrita de forma a mencionar todas alternativas e casos especiais.
+Tais informações podem ser encontradas nos parágrafos de **Alternativa** e nas seções de [Discussão](#S-discussion).
+Se você não entender uma regra ou de discordar dela, favor visitar sua **Discussão**.
+Se achar que uma discussão está faltando ou está incompleta, crie uma [Issue](https://github.com/isocpp/CppCoreGuidelines/issues) (repo original em inglês) explicando suas preocupações e possivelmente um PR (Pull-Request) associado.
 
-This is not a language manual.
-It is meant to be helpful, rather than complete, fully accurate on technical details, or a guide to existing code.
-Recommended information sources can be found in [the references](#S-references).
+Isso não é um manual da linguagem.
+Essas diretrizes tem por objetivo serem úteis, não serem completas, totalmente precisas em detalhes técnicos ou um guia para código existente.
+Fontes de informação recomendadas podem ser encontradas nas [referências](#S-references).
 
 ## <a name="SS-sec"></a>In.sec: Principais seções
 
@@ -312,25 +409,32 @@ Recommended information sources can be found in [the references](#S-references).
 * [Enum: Enumerações](#S-enum)
 * [R: Gerência de recursos](#S-resource)
 * [ES: Expressões e declarações](#S-expr)
-* [E: Resolução de erros](#S-errors)
+* [Per: Performance](#S-performance)
+* [CP: Concorrência e paralelismo](#S-concurrency)
+* [E: Tratamento de erros](#S-errors)
 * [Con: Constantes e imutabilidade](#S-const)
 * [T: Templates e programação genérica](#S-templates)
-* [CP: Concorrência](#S-concurrency)
-* [SL: The Standard library](#S-stdlib)
-* [SF: Arquivos fonte](#S-source)
 * [CPL: Programação estilo C](#S-cpl)
-* [Pro: Perfis](#S-profile)
-* [GSL: Guideline support library](#S-gsl)
-* [FAQ: Respostas a perguntas frequentes](#S-faq)
+* [SF: Arquivos fonte](#S-source)
+* [SL: A Biblioteca Padrão](#S-stdlib)
 
 Seções de suporte:
 
-* [NL: Nomenclatura e layout](#S-naming)
-* [Per: Performance](#S-performance)
-* [N: Não-Regras e mitos](#S-not)
+* [A: Idéias arquiteturais](#S-A)
+* [NR: Não-Regras e mitos](#S-not)
 * [RF: Referências](#S-references)
+* [Pro: Perfis](#S-profile)
+* [GSL: Guideline support library](#S-gsl)
+* [NL: Nomenclatura e regras de layout](#S-naming)
+* [FAQ: Respostas para perguntas frequentes](#S-faq)
 * [Apêndice A: Bibliotecas](#S-libraries)
 * [Apêndice B: Modernizando código](#S-modernizing)
 * [Apêndice C: Discussão](#S-discussion)
+* [Apêndice D: Ferramentas de suporte](#S-tools)
 * [Glossário](#S-glossary)
 * [Pendências: Proto-regras não-classificadas](#S-unclassified)
+
+Essas seções não são ortogonais.
+
+Cada seção (por exemplo, "P" -> "Filosofia") e cada subseção (exemplo: "C.hier" para hierarquias de classes) tem uma abreviação para facilitar buscas e referência.
+Abreviações das seções principais também são utilizadas nos números das regras (exemplo: "C.11" para "Torne regular tipos concretos").
