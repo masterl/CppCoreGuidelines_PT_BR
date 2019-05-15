@@ -1,4 +1,4 @@
-# Diretrizes Centrais para C++
+[![C++ Core Guidelines](cpp_core_guidelines_logo_text.png)](http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
 ***Tradução em português do Brasil***
 
@@ -18,13 +18,15 @@ O documento é escrito em [GitHub-flavored MarkDown](https://github.github.com/g
 
 - Existe também uma versão para browser (**em inglês**) (http://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines) que é manualmente atualizada então ***normalmente está um pouco atrasada em relação ao texto em MarkDown***
 
+As diretrizes são um documento em constante evolução, mas sem uma frequência estrita de updates. O Bjarne Stroustrup periodicamente revisa o documento e incremente o número da versão na introdução.
+
 Boa parte das diretrizes fazem uso da biblioteca *header-only* **Guideline Support Library**. Uma implementação dessa biblioteca está disponível em [GSL: Guideline Support Library](https://github.com/Microsoft/GSL).
 
 ## Experiência e escopo
 
 O objetivo das diretrizes é auxiliar as pessoas a utilizarem C++ moderno de forma efetiva. Por "C++ moderno" nos referimos a C++11, C++14 e C++17. Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
 
-As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência. Tais regras afetam arquitetura da aplicação e projeto de bibliotecas. Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de memória, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
+As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência. Tais regras afetam arquitetura da aplicação e projeto de bibliotecas. Seguir as diretrizes irá proporcionar código com segurança estática de tipos, sem vazamento de recursos, além de pegar muitos dos erros de lógica que são comums hoje em dia e irá rodar rápido -- você pode fazer as coisas da forma correta.
 
 Estamos menos preocupados com problemas de baixo-nível, tais como convenções de nome e estilo de indentação, entretanto nenhum tópico que possa auxiliar um programador está fora dos limites.
 
@@ -32,7 +34,7 @@ Nosso conjunto inicial de regras enfatizam segurança (de diversas formas) e sim
 
 Você irá considerar algumas das regras contrárias às suas expectativas ou mesmo contrárias à sua experiência. Se não tivéssemos sugerido que você mudasse seu estilo de codificação de alguma forma, então falhamos! Por favor teste para verificar ou negar as regras! Adoraríamos ter algumas de nossas regras melhor embasadas por medidas ou melhores exemplos.
 
-Você irá achar algumas das regras muito óbvias ou mesmo triviais. Tente lembrar que um dos propósitos de uma diretriz é ajudar alguém que tenha pouca experiência ou que venha de um ambiente ou linguagem diferente a se nivelarem.
+Você irá achar algumas das regras muito óbvias ou mesmo triviais. Tente lembrar que um dos propósitos de uma diretriz é ajudar alguém que tenha pouca experiência ou que venha de um ambiente ou linguagem diferente a se nivelar.
 
 As diretrizes são projetadas para terem suporte de uma ferramenta de análise. Violações das regras serão indicadas com referências (ou links) para a regra em questão.
 Não esperamos que você memorize todas as regras antes de começar a escrever código.
