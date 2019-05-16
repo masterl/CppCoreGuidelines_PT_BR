@@ -1,6 +1,6 @@
 # <a name="main"></a>Diretrizes Centrais para C++
 
-#### Tradução de um snapshot de 21/04/2018
+#### Tradução de um snapshot de 02 de Maio de 2019
 
 ***!!! tradução em progresso !!!***
 
@@ -11,7 +11,7 @@ Editores:
 
 Este é um documento vivo que sofre melhorias constantemente.
 Se fosse um projeto open source (código), esta seria a versão 0.8.
-Cópia, utilização, modificação e criação de trabalhos derivados deste projeto está licenciada sob uma licença MIT.
+Cópia, utilização, modificação e criação de trabalhos derivados deste projeto está licenciada sob uma licença estilo MIT.
 Contribuir para este projeto requer concordar com a Licença de Contribuidor. Ver [LICENSE](LICENSE) para maiores detalhes.
 Deixamos este projeto disponível para "usuários amigáveis" usarem, copiarem, modificarem e derivarem dele, na esperança de uma contribuição positiva.
 
@@ -39,7 +39,7 @@ Você pode [ler uma explicação do escopo e estrutura destas diretrizes](#S-abs
 * [ES: Expressões e declarações](#S-expr)
 * [Per: Performance](#S-performance)
 * [CP: Concorrência e paralelismo](#S-concurrency)
-* [E: Resolução de erros](#S-errors)
+* [E: Tratamento de erros](#S-errors)
 * [Con: Constantes e imutabilidade](#S-const)
 * [T: Templates e programação genérica](#S-templates)
 * [CPL: Programação no estilo C](#S-cpl)
@@ -52,7 +52,7 @@ Seções de suporte:
 * [N: Não-regras e mitos](#S-not)
 * [RF: Referências](#S-references)
 * [Pro: Perfis](#S-profile)
-* [GSL: Guideline support library](#S-gsl)
+* [GSL: Guidelines support library](#S-gsl)
 * [NL: Nomenclatura e regras de layout](#S-naming)
 * [FAQ: Respostas para perguntas frequentes](#S-faq)
 * [Apêndice A: Bibliotecas](#S-libraries)
@@ -68,9 +68,9 @@ ou olhe uma funcionalidade específica da linguagem
 [tipos regulares](#Rc-regular) --
 [prefira inicialização](#Rc-initialize) --
 [cópia](#Rc-copy-semantics) --
-[movimento](#Rc-move-semantics) --
+[move](#Rc-move-semantics) --
 [outras operações](#Rc-matched) --
-[padrão](#Rc-eqdefault)
+[default](#Rc-eqdefault)
 * `class`:
 [dados](#Rc-org) --
 [invariante](#Rc-struct) --
@@ -104,7 +104,7 @@ ou olhe uma funcionalidade específica da linguagem
 [sobrecarga](#Rh-using) --
 [fatiando](#Rc-copy-virtual) --
 [`dynamic_cast`](#Rh-dynamic_cast)
-* destrutores:
+* destrutor:
 [e construtores](#Rc-matched) --
 [quando são necessários?](#Rc-dtor) --
 [não devem falhar](#Rc-dtor-fail)
@@ -189,7 +189,7 @@ Definição de termos usados para expressar e discutir as regras, que não são 
 
 Este documento é um conjunto de diretrizes para utilizar C++ bem.
 O objetivo deste documento é ajudar as pessoas a utilizarem C++ moderno efetivamente.
-Por "C++ moderno" queremos dizer C++17, C++14 e C++11.
+Por "C++ moderno" queremos dizer o uso efetivo do padrão ISO do C++ (atualmente, C++17, mas quase todas nossas recomendações também se aplicam a C++14 e C++11).
 Em outras palavras, como você gostaria que seu código fosse visto em 5 anos, dado que você pode iniciar agora? Em 10 anos?
 
 As diretrizes focam em problemas de alto-nível, tais como interfaces, gerência de recursos, gerência de memória e concorrência.
@@ -223,7 +223,7 @@ Planejamos modificar e extender este documento conforme nosso entendimento melho
 
 # <a name="S-introduction"></a>In: Introdução
 
-Este é um conjunto de diretrizes para C++ moderno, C++17, C++14 e C++11, absorvendo melhorias futuras e levando em consideração Especificações Técnicas ISO (TSs) (*ISO Technical Specifications*).
+Este é um conjunto de diretrizes para C++ moderno (atualmente C++17), absorvendo melhorias futuras e levando em consideração Especificações Técnicas ISO (TSs) (*ISO Technical Specifications*).
 O objetivo é ajudar programadores C++ a escreverem códigos mais simples, eficientes e manuteníveis.
 
 Índice de introdução:
@@ -241,10 +241,10 @@ Todos os programadores C++. Isso inclui [programadores que talvez considerem C](
 
 ## <a name="SS-aims"></a>In.aims: Objetivos
 
-A proposta deste documento é auxiliar desenvolvedores a adotar C++ moderno (C++17, C++14 e C++11) e para atingirmos um estilo mais uniforme através das bases de código.
+A proposta deste documento é auxiliar desenvolvedores a adotar C++ moderno (atualmente C++17) e para atingirmos um estilo mais uniforme através das bases de código.
 
 Nós não temos a ilusão de que cada uma dessas regras possam ser efetivamente aplicadas a todas as bases de código. Atualizar sistemas antigos é difícil. Entretanto, acreditamos que um programa que utilize uma regra é menos propenso a erros e mais manutenível que um que não utilize. Frequentemente, as regras levam a um desenvolvimento inicial mais rápido/fácil.
-Até onde sabemos, essas regras levam a código que rodam tão bem ou melhor que técnicas antigas ou mais convencionais; são regras que seguem o princípio de zero gasto adicional (*zero-overhead*) (*"O que vc não utiliza, você não irá pagar por isso"* ou *"quando você utiliza um mecanismo de abstração de forma correta, você obtém performance pelo menos tão boa quanto se você tivesse escrito o código a mão utilizando construções de baixo-nível da linguagem"*).
+Até onde sabemos, essas regras levam a código que rodam tão bem ou melhor que técnicas antigas ou mais convencionais; são regras que seguem o princípio de zero custo adicional (*zero-overhead*) (*"O que vc não utiliza, você não irá pagar por isso"* ou *"quando você utiliza um mecanismo de abstração de forma correta, você obtém performance pelo menos tão boa quanto se você tivesse escrito o código a mão utilizando construções de baixo-nível da linguagem"*).
 Considere estas diretrizes como ideais para novos códigos, oportunidades para explorar quando estiver trabalhando com código antigo e tente se aproximar desses ideais o máximo possível.
 Lembre:
 
@@ -274,7 +274,7 @@ Construa sua pequena biblioteca base e use-a, ao invés de rebaixar seu nível d
 As regras são projetadas para permitir [adoção gradual](#S-modernizing).
 
 Algumas regras visam aumentar várias formas de segurança enquanto outras visam reduzir a probabilidade de acidentes, muitas fazem ambos.
-As diretrizes destinadas a prevenir acidentes frequentemente banem trechos C++ perfeitamente legais.
+As diretrizes destinadas a prevenir acidentes frequentemente banem trechos de código C++ perfeitamente legais.
 Entretanto, quando existem duas maneiras de expressar uma ideia e uma é sabidamente uma fonte de erros e a outra não, tentaremos guiar os programadores para utilizarem a segunda.
 
 ## <a name="SS-non"></a>In.not: Não-objetivos
@@ -311,6 +311,11 @@ Nós valorizamos expressividade e performance sem compromisso.
 As regras não são neutras.
 Elas foram feitas para tornar código mais simples e mais correto/seguro do que a maior parte dos códigos C++ existentes, sem perda de performance.
 Elas foram feitas para inibir códigos C++ perfeitamente válidos que correlacionam com erros, complexidade falsa e baixa performance.
+
+As regras não são precisas a um ponto tal que uma pessoa (ou máquina) possa seguí-las às cegas.
+As partes sobre execução das regras tentam ser isso, mas preferimos deixar uma regra ou definição um pouco vagas e abertas à interpretação do que especificar algo de forma precisa e errada.
+Algumas vezes, precisão vem somente com o tempo e experiência.
+Design (ainda) não é uma forma de Matemática.
 
 As regras não são perfeitas.
 Uma regra pode causar mal ao proibir algo que é útil em uma determinada situação.
@@ -360,14 +365,13 @@ Ferramentas que implementem essas regras devem respeitar a seguinte sintaxe para
 
     [[gsl::suppress(tag)]]
 
-onde "tag" é nome da âncora do item onde a regra de Imposição aparece.
+onde "tag" é nome âncora do item onde a regra de Imposição aparece.
 
 Exemplos:
 
 - para [C.134](#Rh-public) é "Rh-public")
 - o nome de um perfil de grupo de regras ("type", "bounds" ou "lifetime")
-- uma regra específica em um perfil ([type.4](#Pro-type-cstylecast))
-- [bounds.2](#Pro-bounds-arrayindex)
+- uma regra específica em um perfil ([type.4](#Pro-type-cstylecast), ou [bounds.2](#Pro-bounds-arrayindex)
 
 ## <a name="SS-struct"></a>In.struct: Estrutura deste documento
 
@@ -506,7 +510,7 @@ void f(vector<string>& v)
 }
 ```
 
-##### Example; bom
+##### Exemplo; bom
 
 Uma forma muito mais clara de expressar intenção seria:
 
@@ -600,7 +604,7 @@ while (i < v.size()) {
 
 ```
 
-A intenção de "apenas" iterar pelos elementos de `v` não está explícita aqui. O detalhe de implementação de um índice está exposto (então pode ser utilizado incorretamente) e `i` continua existindo fora do escopo do laço, o que pode ou não ser intencional. O leitor não consegue saber somente com esse trecho de código.
+A intenção de "apenas" iterar pelos elementos de `v` não está expressada aqui. O detalhe de implementação de um índice está exposto (então pode ser utilizado incorretamente) e `i` continua existindo fora do escopo do laço, o que pode ou não ser intencional. O leitor não consegue saber somente com esse trecho de código.
 
 Melhor:
 
@@ -619,7 +623,8 @@ for (auto& x : v) { /* modifica x */ }
 ```
 
 Para mais detalhes sobre laços for, veja [ES.71](#Res-for-range).
-Melhor ainda, utilize um algoritmo nomeado:
+
+Melhor ainda, utilize um algoritmo nomeado. Esse exemplo utiliza o `for_each` da *Ranges TS* porque ele expressa diretamente a intenção:
 
 ```cpp
 
@@ -628,13 +633,13 @@ for_each(par, v, [](int x) { /* faz algo com o valor de x */ });
 
 ```
 
-A última opção deixa claro que não estamos interessados na ordem em que os elementos de `v` são utilizados.
+A última opção deixa claro que não estamos interessados na ordem em que os elementos de `v` são manipulados.
 
 Um programador deve se familiarizar com
 
 * [A biblioteca de suporte às diretrizes](#S-gsl)
 * [A biblioteca padrão ISO C++](#S-stdlib)
-* Quaisquer bibliotecas utilizadas no projeto atual
+* Quaisquer bibliotecas base utilizadas no projeto atual
 
 ##### Nota
 
@@ -659,13 +664,13 @@ draw_line(Point, Point);        // mais claro
 
 Procure por padrões comuns para os quais existem alternativas melhores
 
-* laços `for` simples ***ou*** `range-for`
-* interfaces `f(T*, int)` ***ou*** `f(span<T>)`
+* laços `for` simples vs `range-for`
+* interfaces `f(T*, int)` vs `f(span<T>)`
 * variáveis de controle de laço em escopos muito grandes
 * `new` e `delete` nus
 * funções com muitos parâmetros de tipos básicos
 
-Existem muitas oportunidades para esperteza e transformação de programa semi-automática.
+Existem muitas oportunidades para esperteza e transformação semi-automática do programa.
 
 ### <a name="Rp-typesafe"></a>P.4: Idealmente, um programa deve ser staticamente *type safe*
 
@@ -677,7 +682,7 @@ Infelizmente, isso não é possível. Áreas problemáticas:
 * `union`s
 * casts (conversões de tipo)
 * decaimento de array
-* erros de coleção (por exemplo, acessar posição fora de um array)
+* erros de coleção (*range*) (por exemplo, acessar posição fora de um array)
 * conversões truncantes
 
 ##### Nota
@@ -694,7 +699,7 @@ Por exemplo:
 * `union`s -- use `variant` (introduzido no C++17)
 * casts -- minimize seu uso; templates podem ajudar
 * decaimento de array -- utilize `span` (da GSL)
-* erros de coleção -- utilize `span`
+* erros de coleção (*range*) -- utilize `span`
 * conversões truncantes -- minimize seu uso ou utilize `narrow` ou `narrow_cast` (da GSL) onde forem necessárias
 
 ### <a name="Rp-compile-time"></a>P.5: Prefira checagem em tempo de compilação em detrimento das em tempo de execução
@@ -707,18 +712,18 @@ Você não precisa tratar erros que possam ser pegos em tempo de compilação.
 ##### Exemplo
 
 ```cpp
-// int is an alias used for integers
 int bits = 0;               // não faça: código evitável
+// Nota: Int é um apelido usado para inteiros
 for (Int i = 1; i; i <<= 1)
     ++bits;
 if (bits < 32)
-    cerr << "Int too small\n";
+    cerr << "Int muito pequeno\n";
 ```
 
 Esse exemplo falha no que ele está tentando fazer (devido a overflow ser indefinido) e deveria ser trocado por um simples `static_assert`:
 
 ```cpp
-// int is an alias used for integers
+// Int é um apelido usado para inteiros
 static_assert(sizeof(Int) >= 4);    // faça: checagem em tempo de compilação
 ```
 
@@ -742,12 +747,12 @@ int a[100];
 read(a);        // melhor: deixe o compilador definir a quantidade de elementos
 ```
 
-**Justificativa**: Não deixe para tempo de execução o que pode ser feito em tempo de compilação
+**Justificativa**: Não deixe para tempo de execução o que pode ser feito bem em tempo de compilação
 
 ##### Imposição
 
 * Procure por argumentos do tipo ponteiro
-* Procure por checagens em tempo de execução de violações de coleção
+* Procure por checagens em tempo de execução de violações de coleção (*range*)
 
 ### <a name="Rp-run-time"></a>P.6: O que não pode ser checado em tempo de compilação deve ser checável em tempo de execução
 
@@ -776,7 +781,7 @@ Aqui uma parte crucial da informação (o número de elementos) foi tão "oculta
 
 ##### Exemplo, ruim
 
-Claro, poderíamos passar o número de elementos junto do ponteiro:
+Claro, poderíamos passar o número de elementos junto ao ponteiro:
 
 ```cpp
 // compilado separadamente, possivelmente carregado dinamicamente
@@ -788,7 +793,7 @@ void g2(int n)
 }
 ```
 
-Passar o número de elementos como argumento é melhor (e bem mais comum) que passar somente o ponteiro e depender de alguma convenção implícita em relação à quantidade de elementos ou como calcular tal informação. Entretanto, como demonstrado, um simples erro de digitação pode introduzir um erro sério. A conexão entre os dois argumentos de `f2()` é convencional e não explícita.
+Passar o número de elementos como argumento é melhor (e bem mais comum) que passar somente o ponteiro e depender de alguma convenção implícita em relação à quantidade de elementos ou como descobrir tal informação. Entretanto, como demonstrado, um simples erro de digitação pode introduzir um erro sério. A conexão entre os dois argumentos de `f2()` é convencional e não explícita.
 
 Outra coisa, será que também está implícito que `f2()` deve fazer o `delete` desse ponteiro ou será que quem chamou a função cometeu um segundo erro?
 
@@ -815,13 +820,13 @@ Precisamos passar o ponteiro e a quantidade de elementos como um objeto só:
 ```cpp
 extern void f4(vector<int>&);   // compilado separadamente, possivelmente carregado dinamicamente
 extern void f4(span<int>);      // compilado separadamente, possivelmente carregado dinamicamente
-                                // NB: NB: assume-se que o código executor seja ABI-compatible, utilizando
+                                // NB: assume-se que o código executor seja ABI-compatible, utilizando
                                 // um compilador C++ compatível e a mesma implementação da stdlib
 
 void g3(int n)
 {
     vector<int> v(n);
-    f4(v);                     // passa uma reference, mantém posse
+    f4(v);                     // passa uma referência, mantém posse
     f4(span<int>{v});          // passa uma visualização, mantém posse
 }
 ```
@@ -833,7 +838,7 @@ Esse design carrega a quantidade de elementos junto como parte de um objeto, ass
 Como podemos transferir tanto posse quanto todas as informações para validar o uso?
 
 ```cpp
-vector<int> f5(int n)    // OK: movimento
+vector<int> f5(int n)    // OK: move
 {
     vector<int> v(n);
     // ... inicializa v ...
