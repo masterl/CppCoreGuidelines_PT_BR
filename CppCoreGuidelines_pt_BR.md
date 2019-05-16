@@ -1197,3 +1197,30 @@ Essa é uma variante do [princípio do subset do superset](#R0) que constitui a 
 ##### Imposição
 
 * Procure por "código bagunçado" tais como manipulaçao complexa de ponteiros e casting fora da implementação de abstrações.
+
+### <a name="Rp-tools"></a>P.12: Use ferramentas de suporte quando apropriado
+
+##### Razão
+
+Existem muitas coisas que são melhor feitas "por máquina".
+Computadores não se cansam ou se entediam com tarefas repetitivas.
+Nós normalmente temos coisas melhores a fazer do que realizar tarefas rotineiras repetidamente.
+
+##### Exemplo
+
+Executar um analizador estático para verificar se seu código segue as diretrizes que você quer que ele siga.
+
+##### Nota
+
+Veja
+
+* [Ferramentas de análise estática](???)
+* [Ferramentas de concorrência](#Rconc-tools)
+* [Ferramentas de teste](???)
+
+Existem diversos outros tipos de ferramentas, tais como repositórios de código, ferramentas de build, etc., mas estes estão fora do escopo dessas diretrizes.
+
+##### Nota
+
+Tome o cuidado de não se tornar dependente de tool chains elaboradas ou ultra-especializadas.
+Essas podem tornar seu código não-portável.
