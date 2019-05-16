@@ -457,7 +457,7 @@ Lista de regras filosóficas:
 * [P.6: O que não pode ser checado em tempo de compilação deve ser checável em tempo de execução](#Rp-run-time)
 * [P.7: Capture erros em tempo de execução cedo](#Rp-early)
 * [P.8: Não vaze recursos](#Rp-leak)
-* [P.9: Não desperdiçe tempo ou espaço](#Rp-waste)
+* [P.9: Não desperdice tempo ou espaço](#Rp-waste)
 * [P.10: Prefira dados imutáveis](#Rp-mutable)
 * [P.11: Encapsule conceitos complicados, ao invés de espalhar pelo código](#Rp-library)
 * [P.12: Use ferramentas de suporte quando apropriado](#Rp-tools)
@@ -1055,3 +1055,84 @@ Combine isso com a imposição de [perfis de tipo e limites](#SS-force) e você 
   Alternativamente, marque um dono por meio do uso de `owner` da [GSL](#S-gsl).
 * Procure por `new` e `delete`
 * Procure por funções de alocação de recursos conhecidas que retornem ponteiros simples (tais como `fopen`, `malloc`, e `strdup`)
+
+### <a name="Rp-waste"></a>P.9: Não desperdice tempo ou espaço
+
+##### Razão
+
+Isso é C++.
+
+##### Nota
+
+Tempo e espaço que você gasta bem para atingir um objetivo (exemplo: velocidade de desenvolvimento, segurança de recursos ou simplificação de teste) não é desperdiçado.
+
+"Another benefit of striving for efficiency is that the process forces you to understand the problem in more depth." - Alex Stepanov
+
+Tradução: *Outro benefício de se esforçar por eficiência é que o processo te força a entender o problema mais profundamente.*
+
+##### Exemplo, ruim
+
+```cpp
+struct X {
+    char ch;
+    int i;
+    string s;
+    char ch2;
+
+    X& operator=(const X& a);
+    X(const X&);
+};
+
+X waste(const char* p)
+{
+    if (!p) throw Nullptr_error{};
+    int n = strlen(p);
+    auto buf = new char[n];
+    if (!buf) throw Allocation_error{};
+    for (int i = 0; i < n; ++i) buf[i] = p[i];
+    // ... manipula o buffer ...
+    X x;
+    x.ch = 'a';
+    x.s = string(n);    // dá a x.s espaço para *p
+    for (gsl::index i = 0; i < x.s.size(); ++i) x.s[i] = buf[i];  // copia 'buf' pra x.s
+    delete[] buf;
+    return x;
+}
+
+void driver()
+{
+    X x = waste("Argumento típico");
+    // ...
+}
+```
+
+Sim, isso é uma caricatura, mas nós vimos cada erro em código de produção e pior.
+Note que o layout de `X` garante que pelo menos 6 bytes (e provavelmente mais) são desperdiçados.
+A definição enganosa de operações de cópia desabilitam as semânticas de transferência tal que a operação de return se torna lenta (note que a otimização de valor de retorno, RVO, não é garantida aqui).
+O uso de `new` e `delete` para `buf` é redundante. Se realmente precisássemos de uma string local, deveríamos utilizar um objeto `string` local.
+Tem ainda mais bugs de performance e complicação gratuita.
+
+##### Exemplo, ruim
+
+```cpp
+void lower(zstring s)
+{
+    for (int i = 0; i < strlen(s); ++i) s[i] = tolower(s[i]);
+}
+```
+
+Sim, esse é um exemplo de código de produção.
+Deixamos por conta do leitor descobrir o que está sendo desperdiçado.
+
+##### Nota
+
+Um exemplo individual de desperdício raramente é significativo e quando é significativo, costuma ser facilmente eliminado por um expert.
+Entretanto, desperdício espalhado através da base de código pode se tornar significativo e os experts nem sempre estão disponíveis como gostaríamos.
+O objetivo desta regra (e das regras mais específicas que a dão suporte) é eliminar a maior parte dos desperdícios relacionados ao uso do C++ antes que eles aconteçam.
+Após isso, podemos analizar o desperdício relacionado a algoritmos e requisitos, mas isso está além do escopo dessas diretrizes.
+
+##### Imposição
+
+Várias outras regras mais específicas tem por objetivos simplicidade e eliminação de desperdício gratuito em geral.
+
+* Marque um valor de retorno não utilizado de uma `operator++` ou `operator--` pós-fixo não-default definido pelo usuário. Prefira utilizar a forma pré-fixa. (Nota: "definido pelo usuário" e "não-default" são para reduzir ruído. Revise esta imposição caso ainda produza muito ruído na prática.)
