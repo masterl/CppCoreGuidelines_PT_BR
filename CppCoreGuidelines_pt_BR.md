@@ -1136,3 +1136,14 @@ Após isso, podemos analizar o desperdício relacionado a algoritmos e requisito
 Várias outras regras mais específicas tem por objetivos simplicidade e eliminação de desperdício gratuito em geral.
 
 * Marque um valor de retorno não utilizado de uma `operator++` ou `operator--` pós-fixo não-default definido pelo usuário. Prefira utilizar a forma pré-fixa. (Nota: "definido pelo usuário" e "não-default" são para reduzir ruído. Revise esta imposição caso ainda produza muito ruído na prática.)
+
+### <a name="Rp-mutable"></a>P.10: Prefira dados imutáveis
+
+##### Razão
+
+É mais fácil raciocinar sobre constantes do que variáveis.
+Algo imutável não irá mudar de forma inexperada.
+Algumas vezes imutabilidade permite realizar otimizações melhores.
+Você não pode ter uma condição de concorrência em uma constante.
+
+Veja [Con: Constantes e imutabilidade](#S-const)
