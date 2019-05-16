@@ -871,3 +871,130 @@ owner<int*> f7(int n)    // ruim: perde o 'n' e podemos esquecer de executar o `
 
 * Sinalize interfaces do tipo (ponteiro, contador) (isso irá sinalizar vários exemplos que não podem ser corrigidos por questões de compatibilidade)
 * ???
+
+### <a name="Rp-early"></a>P.7: Capture erros em tempo de execução cedo
+
+##### Razão
+
+Evite quebras "misteriosas".
+Evite erros que levem a resultados errados (potencialmente não percebidos).
+
+##### Exemplo
+
+```cpp
+void increment1(int* p, int n)    // ruim: propenso a erro
+{
+    for (int i = 0; i < n; ++i) ++p[i];
+}
+
+void use1(int m)
+{
+    const int n = 10;
+    int a[n] = {};
+    // ...
+    increment1(a, m);   // talvez erro de digitação, talvez assume-se m <= n
+                        // mas imagine que m == 20
+    // ...
+}
+```
+
+Aqui cometemos um pequeno erro em `use1` que irá implicar em corrupção de dados ou quebra do programa.
+O estilo de interface (ponteiro, tamanho) deixa `increment1` sem nenhuma forma real de se defender de erros de acesso fora da coleção (*range*).
+Se pudéssemos checar os índices para detectar um acesso fora da coleção (*range*), então o erro não seria descoberto até que acessássemos `p[10]`.
+Poderíamos checar antecipadamente e melhorar o código:
+
+```cpp
+void increment2(span<int> p)
+{
+    for (int& x : p) ++x;
+}
+
+void use2(int m)
+{
+    const int n = 10;
+    int a[n] = {};
+    // ...
+    increment2({a, m});    // talvez erro de digitação, talvez assume-se m <= n
+    // ...
+}
+```
+
+Agora `m <= n` pode ser checado no ponto de chamada (cedo) e não após algum potencial uso errado.
+Caso seja somente um erro de digitação e quiséssemos utilizar `n` como limite, o código pode ser simplificado ainda mais (eliminando a possibilidade de erros):
+
+```cpp
+void use3(int m)
+{
+    const int n = 10;
+    int a[n] = {};
+    // ...
+    increment2(a);   // não é necessário repetir a quantidade de elementos de 'a'
+    // ...
+}
+```
+
+##### Exemplo, ruim
+
+Não cheque o mesmo valor repetidas vezes. Não passe dados estruturados como strings:
+
+```cpp
+Date read_date(istream& is);    // lê data por meio da istream
+
+Date extract_date(const string& s);    // extrai data da string
+
+void user1(const string& date)    // manipula data
+{
+    auto d = extract_date(date);
+    // ...
+}
+
+void user2()
+{
+    Date d = read_date(cin);
+    // ...
+    user1(d.to_string());
+    // ...
+}
+```
+
+A data é validada duas vezes (pelo construtor de `Date`) e passada como uma string (dados não-estruturados).
+
+##### Exemplo
+
+Checagens excessivas podem custar muito.
+Há casos onde checagem prematura é sem sentido porque talvez vc nunca precise do valor, ou talvez só precise de parte do valor que é mais facilmente checável que o valor inteiro. Similarmente, não adicione checagens de validade que alterem o comportamento assintótico de sua interface (exemplo: não adicione uma checagem `O(n)` para uma interface com complexidade média de `O(1)`).
+
+```cpp
+class Jet {    // Física diz: e * e < x * x + y * y + z * z
+    float x;
+    float y;
+    float z;
+    float e;
+public:
+    Jet(float x, float y, float z, float e)
+        :x(x), y(y), z(z), e(e)
+    {
+        // Devo checar aqui se os valores têm significado físico?
+    }
+
+    float m() const
+    {
+        // Devo tratar o caso inválido aqui?
+        return sqrt(x * x + y * y + z * z - e * e);
+    }
+
+    // ???
+};
+```
+
+A lei física para um jet (`e * e < x * x + y * y + z * z`) não é uma invariante devido a possibilidade de erros de medida.
+
+???
+
+##### Imposição
+
+* Procure por ponteiros e arrays: Cheque o tamanho cedo e não repetidamente
+* Procure por conversões: Elimine ou marque conversões truncantes
+* Procure por valores não checados que venham de alguma entrada
+* Procure por dados estruturados (objetos de classes com invariantes) sendo convertidos em strings
+* ???
