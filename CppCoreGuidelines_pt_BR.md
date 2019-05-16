@@ -998,3 +998,60 @@ A lei física para um jet (`e * e < x * x + y * y + z * z`) não é uma invarian
 * Procure por valores não checados que venham de alguma entrada
 * Procure por dados estruturados (objetos de classes com invariantes) sendo convertidos em strings
 * ???
+
+### <a name="Rp-leak"></a>P.8: Não vaze recursos
+
+##### Razão
+
+Mesmo um crescimento devagar em uso recursos irá (com o tempo) exaurir a disponibilidade desses recursos.
+Isso é particularmente importante para programas que rodem por um longo tempo, mas é uma parte essencial de um comportamento de programação responsável.
+
+##### Exemplo, ruim
+
+```cpp
+void f(char* name)
+{
+    FILE* input = fopen(name, "r");
+    // ...
+    if (something) return;   // ruim: se something == true, um descritor de arquivo é vazado
+    // ...
+    fclose(input);
+}
+```
+
+Prefira [RAII](#Rr-raii):
+
+```cpp
+void f(char* name)
+{
+    ifstream input {name};
+    // ...
+    if (something) return;   // OK: sem vazamento
+    // ...
+}
+```
+
+**Veja também**: [A seção de gerência de recursos](#S-resource)
+
+##### Nota
+
+Um vazamento é coloquialmente chamado "qualquer coisa que não é limpa".
+A classificação mais importante é "qualquer coisa que não pode ser mais limpa".
+Por exemplo, alocar um objeto na heap e depois perder o último ponteiro que apontava para aquela alocação.
+Essa regra não deve ser considerada como requerer que alocações em objetos de longa vida devem ser retornadas ao final do programa.
+Por exemplo, depender na limpeza garantida pelo sistema, como fechar arquivos e desalocação de memória ao final do processo podem simplificar o código.
+Entretanto, depender em abstrações que fazem limpeza implícita podem ser igualmente simples e normalmente mais seguras.
+
+##### Nota
+
+Impor [o perfil de segurança de duração](#SS-lifetime) elimina vazamentos.
+Quando combinado com segurança de recursos provida pela [RAII](#Rr-raii), elimina a necessidade de "coleção de lixo" (por não gerar lixo).
+Combine isso com a imposição de [perfis de tipo e limites](#SS-force) e você obtém segurança completa de tipos e recursos, garantida por ferramentas.
+
+##### Imposição
+
+* Procure por ponteiros: Classifique-os em não-donos (o padrão) e donos.
+  Quando possível, troque os donos por manipuladores de recursos da biblioteca padrão (como no exemplo acima).
+  Alternativamente, marque um dono por meio do uso de `owner` da [GSL](#S-gsl).
+* Procure por `new` e `delete`
+* Procure por funções de alocação de recursos conhecidas que retornem ponteiros simples (tais como `fopen`, `malloc`, e `strdup`)
