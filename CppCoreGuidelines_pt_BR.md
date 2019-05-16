@@ -1224,3 +1224,34 @@ Existem diversos outros tipos de ferramentas, tais como repositórios de código
 
 Tome o cuidado de não se tornar dependente de tool chains elaboradas ou ultra-especializadas.
 Essas podem tornar seu código não-portável.
+
+### <a name="Rp-lib"></a>P.13: Use bibliotecas de suporte quando apropriado
+
+##### Razão
+
+Utilizar uma biblioteca bem projetada, bem documentada e com amplo suporte economiza tempo e esforço.
+Sua qualidade e documentação muito provavelmente serão melhores do que você faria se a maior parte do seu tempo for reservada para uma implementação específica.
+O custo (tempo, esforço, dinheiro, etc.) de uma biblioteca pode ser compartilhado entre vários usuários.
+Uma biblioteca amplamente utilizada, tem mais chances de ser mantida atualizada e portada para novos sistemas.
+Conhecimento de uma biblioteca amplamente utilizada pode economizar tempo em outros projetos e projetos futuros.
+Então, se uma biblioteca afim existir para o domínio da sua aplicação, utilize-a.
+
+##### Exemplo
+
+```cpp
+std::sort(begin(v), end(v), std::greater<>());
+```
+
+A menos que você seja um especialista em algoritmos de ordenação e tenha bastante tempo livre, esse código tem mais chances de ser correto e rodar mais rápido do que qualquer outro que você escreva para uma aplicação específica.
+Você precisa de uma razão para não utilizar a biblioteca padrão (ou qualquer outra biblioteca base que sua aplicação utilize) do que uma razão para utilizá-la.
+
+##### Nota
+
+Por padrão utilize:
+
+* A [Biblioteca Padrão ISO C++](#S-stdlib)
+* A [Guidelines Support Library](#S-gsl)
+
+##### Nota
+
+Se não existir uma biblioteca bem projetada, bem documentada e amplamente suportada para um domínio importante, talvez você deva projetar e implementá-la e então utilizá-la.
