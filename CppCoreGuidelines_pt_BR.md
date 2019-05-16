@@ -1255,3 +1255,41 @@ Por padrão utilize:
 ##### Nota
 
 Se não existir uma biblioteca bem projetada, bem documentada e amplamente suportada para um domínio importante, talvez você deva projetar e implementá-la e então utilizá-la.
+
+# <a name="S-interfaces"></a>I: Interfaces
+
+Uma interface é um contrato entre duas partes de um programa. Definindo precisamente o que é esperado do provedor de um serviço e de um usuário desse serviço é essencial.
+Ter boas interfaces (fáceis de entender, que encorajam uso eficiente, não propensa a erro, que suporte testes, etc.) é provavelmente o aspecto mais importante da organização de código.
+
+Índice das regras de interface:
+
+* [I.1: Crie interfaces explícitas](#Ri-explicit)
+* [I.2: Evite variáveis globais não-`const`](#Ri-global)
+* [I.3: Evite singletons](#Ri-singleton)
+* [I.4: Crie interfaces precisas e fortemente tipadas](#Ri-typed)
+* [I.5: Estabeleça pré-condições (se existirem)](#Ri-pre)
+* [I.6: Prefira `Expects()` para expressar pré-condições](#Ri-expects)
+* [I.7: Estabeleça pós-condições](#Ri-post)
+* [I.8: Prefira `Ensures()` para expressar pós-condições](#Ri-ensures)
+* [I.9: Se uma interface for um template, documente seus parâmetros utilizando concepts](#Ri-concepts)
+* [I.10: Use exceções para sinalizar a falha ao executar uma tarefa](#Ri-except)
+* [I.11: Nunca transfira posse por um ponteiro simples (`T*`) ou referência (`T&`)](#Ri-raw)
+* [I.12: Declare um ponteiro que não pode ser nulo como `not_null`](#Ri-nullptr)
+* [I.13: Não passe um array com um ponteiro simples](#Ri-array)
+* [I.22: Evite inicialização complexa de objetos globais](#Ri-global-init)
+* [I.23: Mantenha baixa a quantidade de argumentos para uma função](#Ri-nargs)
+* [I.24: Evite parâmetros adjacentes do mesmo tipo que não tenham relação entre si](#Ri-unrelated)
+* [I.25: Prefira classes abstratas como interfaces para hierarquia de classes](#Ri-abstract)
+* [I.26: Se você quer uma ABI cross-compiler, utilize o subset estilo C](#Ri-abi)
+* [I.27: Para uma ABI estável de biblioteca, considere o idioma Pimpl](#Ri-pimpl)
+* [I.30: Encapsule violações de regra](#Ri-encapsulate)
+
+**Veja também**:
+
+* [F: Funções](#S-functions)
+* [C.concrete: Tipos concretos](#SS-concrete)
+* [C.hier: Hierarquias de classes](#SS-hier)
+* [C.over: Sobrecarga e sobrecarga de operadores](#SS-overload)
+* [C.con: Contêiners e outros manipuladores de recursos](#SS-containers)
+* [E: Tratamento de erros](#S-errors)
+* [T: Templates e programação genérica](#S-templates)
