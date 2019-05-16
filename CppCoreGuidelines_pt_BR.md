@@ -1147,3 +1147,53 @@ Algumas vezes imutabilidade permite realizar otimizações melhores.
 Você não pode ter uma condição de concorrência em uma constante.
 
 Veja [Con: Constantes e imutabilidade](#S-const)
+
+### <a name="Rp-library"></a>P.11: Encapsule conceitos complicados, ao invés de espalhar pelo código
+
+##### Razão
+
+Código bagunçado tem mais chances de esconder bugs e mais difícil de escrever.
+Uma boa interface é mais fácil e segura de usar.
+Código baixo-nível e bagunçado dá a luz a mais códigos do mesmo tipo.
+
+##### Exemplo
+
+```cpp
+int sz = 100;
+int* p = (int*) malloc(sizeof(int) * sz);
+int count = 0;
+// ...
+for (;;) {
+    // ... ler um inteiro para 'x', sair do laço caso alcance o fim do arquivo ...
+    // ... checa se 'x' é válido ...
+    if (count == sz)
+        p = (int*) realloc(p, sizeof(int) * sz * 2);
+    p[count++] = x;
+    // ...
+}
+```
+
+Isso é baixo-nível, verboso e propenso a erro.
+Por exemplo, "esquecemos" de testar exaustão da memória.
+No lugar, podemos utilizar `vector`:
+
+```cpp
+vector<int> v;
+v.reserve(100);
+// ...
+for (int x; cin >> x; ) {
+    // ... checa se x é válido ...
+    v.push_back(x);
+}
+```
+
+##### Nota
+
+A biblioteca padrão e a GSL são exemplos dessa filosofia.
+Por exemplo, ao invés de interagir com arrays, unions, cast, problemas de tempo de vida, `gsl::owner` e etc., que são necessários para implementar abstrações chave tais como `vector`, `span`, `lock_guard` e `future`, utilizamos bibliotecas desenvolvidas e implementadas por pessoas com mais tempo e conhecimento do que normalmente temos.
+Similarmente, nós podemos e devemos desenvolver e implementar bibliotecas especializadas, ao invés de deixar os usuários (com frequência, nós mesmos) com o desafio repetitivo de escrever bem código baixo-nível.
+Essa é uma variante do [princípio do subset do superset](#R0) que constitui a base dessas diretrizes.
+
+##### Imposição
+
+* Procure por "código bagunçado" tais como manipulaçao complexa de ponteiros e casting fora da implementação de abstrações.
